@@ -83,6 +83,61 @@ h1,h2,h3,h4,h5,h6{font-family:'Sora',sans-serif;line-height:1.08;letter-spacing:
 .faq-a{font-size:.95rem;color:#6b7280;line-height:1.7;padding-top:.75rem;display:none}
 .faq-a.open{display:block}
 
+/* Spin animation (used by video card animated borders) */
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* Marquee (infinite scrolling band) — items triple-rendered, slide -33.33% then loop */
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}
+
+/* Pulse (used by Now Playing live indicator dot) */
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.5}}
+
+/* Wiggle (used by POP! badge on Fizz headline) */
+@keyframes wiggle{0%,100%{transform:rotate(-8deg) scale(1)}25%{transform:rotate(8deg) scale(1.05)}50%{transform:rotate(-5deg) scale(1)}75%{transform:rotate(5deg) scale(1.05)}}
+
+/* Fizz clickable — extra hover affordance */
+.fizz-clickable:hover{filter:drop-shadow(0 8px 24px rgba(230,57,70,.4))}
+
+/* Hover lift utility */
+.lift{transition:transform .35s cubic-bezier(.2,.7,.3,1.1),box-shadow .35s ease}
+.lift:hover{transform:translateY(-6px)}
+
+/* 3D perspective container */
+.persp{perspective:1200px;transform-style:preserve-3d}
+
+/* Video element defaults */
+video{display:block;background:#000}
+video::-webkit-media-controls-overlay-play-button{display:none}
+
 /* Responsive */
 @media(max-width:900px){.container{padding:0 1.25rem}}
-@media(max-width:768px){.hide-sm{display:none!important}.show-sm{display:flex!important}}
+@media(max-width:768px){
+  .hide-sm{display:none!important}.show-sm{display:flex!important}
+  .page-hero{padding:calc(var(--nav-h) + 2rem) 0 3rem}
+  .page-hero h1{font-size:clamp(2.2rem,8vw,3.2rem)}
+  .page-hero p{font-size:1rem;padding:0 1rem}
+  .btn{padding:.75rem 1.5rem;font-size:.9rem}
+  .label{font-size:.7rem;letter-spacing:.12em}
+  section{padding:4rem 0!important}
+}
+@media(max-width:480px){
+  .container{padding:0 1rem}
+}
+
+/* Custom cursor — hide system cursor on hover-capable devices */
+@media(hover:hover) and (pointer:fine){
+  html, html *{cursor:none!important}
+  /* Restore caret for text inputs */
+  input[type="text"],input[type="email"],input[type="tel"],input[type="password"],input[type="search"],textarea,[contenteditable="true"]{cursor:text!important}
+}
+
+/* Touch devices — disable 3D tilt globally for safety */
+@media(hover:none){
+  .persp [style*="transform"]{transform:none!important}
+}
+
+/* Reduce motion */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .blob,.bubble{animation:none!important}
+}
