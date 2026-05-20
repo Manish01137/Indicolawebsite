@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { useTilt, useOnScreen, useDevice } from '../hooks/useTilt'
+import { useScrollTilt } from '../hooks/useScrollTilt'
 import VideoLightbox from '../components/VideoLightbox'
+import { PlayIcon, ArrowIcon } from '../components/SocialIcons'
 
 const ALL_FLAVORS = [
   { name: 'Cherry Cola',          img: '/images/cherry-cola.png',          color: '#e63946', bg: '#ffe4e6', tag: 'Classic',  video: '/videos/cherrycola.mp4',   desc: 'Classic cola meets cherry — bold & unforgettable' },
@@ -23,8 +25,9 @@ const ALL_FLAVORS = [
 const TAGS = ['All', 'With Video', 'Fan Favorite', 'Classic', 'Tropical', 'Sweet', 'Refreshing', 'Zesty', 'Bold', 'Fresh', 'Exotic', 'Unique', 'Summer']
 
 /* ─────────── Card with video preview ─────────── */
-function VideoFlavorCard({ f, onWatch, isMobile }) {
+function VideoFlavorCard({ f, onWatch, isMobile, index }) {
   const tiltRef = useTilt({ intensity: 16, scale: 1.04 })
+  const scrollRef = useScrollTilt({ amount: 5, axis: 'x', invert: index % 2 === 0 })
   const videoRef = useRef(null)
   const [hovered, setHovered] = useState(false)
   const [screenRef, onScreen] = useOnScreen({ threshold: 0.3 })
@@ -41,15 +44,18 @@ function VideoFlavorCard({ f, onWatch, isMobile }) {
 
   return (
     <div ref={screenRef} style={{ perspective: 1100 }}>
+      <div ref={scrollRef}>
       <div
         ref={isMobile ? null : tiltRef}
         onMouseEnter={isMobile ? null : handleEnter}
         onMouseLeave={isMobile ? null : handleLeave}
         style={{
-          background:'#fff', borderRadius:24, overflow:'hidden',
-          boxShadow: hovered ? `0 28px 60px ${f.color}38` : '0 4px 24px rgba(26,26,46,.07)',
+          background:'#fff', borderRadius:26, overflow:'hidden',
+          boxShadow: hovered ? `0 28px 60px ${f.color}38, 0 4px 16px ${f.color}1f` : '0 8px 28px rgba(26,26,46,.09), 0 1px 4px rgba(26,26,46,.04)',
+          border: `1px solid ${f.color}1a`,
           transition: 'box-shadow .4s, transform .5s',
           cursor: 'pointer',
+          transformStyle: 'preserve-3d',
         }}
       >
         {/* Media area */}
@@ -99,59 +105,67 @@ function VideoFlavorCard({ f, onWatch, isMobile }) {
             onClick={(e) => { e.stopPropagation(); onWatch(f) }}
             style={{
               position: 'absolute', top: 14, right: 14, zIndex: 5,
-              width: 44, height: 44, borderRadius: '50%',
-              background: f.color, color: '#fff',
+              width: 46, height: 46, borderRadius: '50%',
+              background: `linear-gradient(135deg, ${f.color}, ${f.color}cc)`, color: '#fff',
               border: 'none', cursor: 'pointer',
-              boxShadow: `0 6px 20px ${f.color}66`,
-              fontSize: '1rem',
+              boxShadow: `0 8px 22px ${f.color}80, inset 0 1px 0 rgba(255,255,255,.3)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'transform .2s, box-shadow .2s',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.12)'; e.currentTarget.style.boxShadow = `0 8px 28px ${f.color}88` }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = `0 6px 20px ${f.color}66` }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.12)'; e.currentTarget.style.boxShadow = `0 12px 32px ${f.color}aa, inset 0 1px 0 rgba(255,255,255,.3)` }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = `0 8px 22px ${f.color}80, inset 0 1px 0 rgba(255,255,255,.3)` }}
             aria-label={`Watch ${f.name}`}
-          >▶</button>
+          ><PlayIcon size={16} /></button>
         </div>
 
         {/* Info */}
         <div style={{ padding: '1.25rem 1.5rem 1.6rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.6rem' }}>
-            <span className="tag" style={{ background: f.color, color: '#fff' }}>▶ Has Video</span>
+            <span className="tag" style={{ background: f.color, color: '#fff', display:'inline-flex', alignItems:'center', gap:'.35rem' }}>
+              <PlayIcon size={10} /> Has Video
+            </span>
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: f.color, boxShadow: `0 0 8px ${f.color}` }} />
           </div>
           <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: '1.1rem', fontWeight: 700, marginBottom: '.4rem' }}>
             {f.name}
           </h3>
           <p style={{ fontSize: '.85rem', color: '#6b7280', marginBottom: '.85rem', lineHeight: 1.55 }}>{f.desc}</p>
-          <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '.85rem', alignItems: 'center' }}>
             <button onClick={(e) => { e.stopPropagation(); onWatch(f) }}
               style={{
                 fontSize: '.85rem', fontWeight: 700, color: f.color, cursor: 'pointer',
                 fontFamily: "'Sora',sans-serif", background: 'none', border: 'none', padding: 0,
+                display:'inline-flex', alignItems:'center', gap:'.35rem',
               }}
-            >▶ Watch Video</button>
+            ><PlayIcon size={11} /> Watch Video</button>
             <Link to="/contact" style={{
               fontSize: '.85rem', fontWeight: 700, color: '#1a1a2e',
               fontFamily: "'Sora',sans-serif",
-            }}>· Order →</Link>
+              display:'inline-flex', alignItems:'center', gap:'.3rem',
+            }}>· Order <ArrowIcon size={12} /></Link>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
 }
 
 /* ─────────── Card without video (static) ─────────── */
-function StaticFlavorCard({ f, isMobile }) {
+function StaticFlavorCard({ f, isMobile, index = 0 }) {
   const tiltRef = useTilt({ intensity: 14, scale: 1.03 })
+  const scrollRef = useScrollTilt({ amount: 5, axis: 'x', invert: index % 2 === 0 })
   return (
     <div style={{ perspective: 1100 }}>
+      <div ref={scrollRef}>
       <div
         ref={isMobile ? null : tiltRef}
         style={{
-          background:'#fff', borderRadius:24, overflow:'hidden',
-          boxShadow:'0 4px 24px rgba(26,26,46,.07)',
+          background:'#fff', borderRadius:26, overflow:'hidden',
+          boxShadow:'0 8px 28px rgba(26,26,46,.09), 0 1px 4px rgba(26,26,46,.04)',
+          border: `1px solid ${f.color}1a`,
           transition: 'box-shadow .4s, transform .5s',
+          transformStyle: 'preserve-3d',
         }}
       >
         <div style={{
@@ -182,11 +196,12 @@ function StaticFlavorCard({ f, isMobile }) {
           <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: '1.1rem', fontWeight: 700, marginBottom: '.4rem' }}>{f.name}</h3>
           <p style={{ fontSize: '.85rem', color: '#6b7280', marginBottom: '.85rem', lineHeight: 1.55 }}>{f.desc}</p>
           <Link to="/contact"
-            style={{ fontSize: '.85rem', fontWeight: 700, color: f.color, fontFamily: "'Sora',sans-serif" }}
+            style={{ fontSize: '.85rem', fontWeight: 700, color: f.color, fontFamily: "'Sora',sans-serif", display:'inline-flex', alignItems:'center', gap:'.35rem' }}
           >
-            Contact Us →
+            Contact Us <ArrowIcon size={13} />
           </Link>
         </div>
+      </div>
       </div>
     </div>
   )
@@ -269,8 +284,8 @@ export default function FlavorsPage() {
                 transition={{ duration: .55, delay: (i % 4) * .07 }}
               >
                 {f.video
-                  ? <VideoFlavorCard  f={f} isMobile={isMobile} onWatch={() => setLightbox(f)} />
-                  : <StaticFlavorCard f={f} isMobile={isMobile} />}
+                  ? <VideoFlavorCard  f={f} isMobile={isMobile} index={i} onWatch={() => setLightbox(f)} />
+                  : <StaticFlavorCard f={f} isMobile={isMobile} index={i} />}
               </motion.div>
             ))}
           </div>

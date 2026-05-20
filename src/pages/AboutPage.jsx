@@ -1,13 +1,20 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { motion } from 'framer-motion'
+import { useTilt, useDevice } from '../hooks/useTilt'
+import { useScrollTilt } from '../hooks/useScrollTilt'
+
+/* Inline SVG glyphs for each value — premium, monochrome, currentColor */
+const Q = (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 2 14.85 8.78 22 9.5l-5.4 4.86L18.2 22 12 18.34 5.8 22l1.6-7.64L2 9.5l7.15-.72L12 2z"/></svg>
+const I = (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+const S = (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M11 20A7 7 0 0 1 4 13c0-5 7-12 7-12s7 7 7 12a7 7 0 0 1-7 7z"/><path d="M11 13a4 4 0 0 0-4-4"/></svg>
+const N = (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M4.5 16.5 3 22l5.5-1.5"/><path d="M21 2s-5.5 1-9.5 5-5 9-5 9 5 0 9-4 5.5-10 5.5-10z"/><path d="M15 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
 
 const VALUES = [
-  { icon: '⭐', title: 'Quality',       color: '#f77f00', bg: '#fff3e0', desc: 'We use only premium ingredients with uncompromised production standards to deliver the finest soda experience.' },
-  { icon: '🤝', title: 'Integrity',     color: '#9b5de5', bg: '#f3e8ff', desc: 'Transparency and honest practices in everything we do — from sourcing to bottling to delivery.' },
-  { icon: '🌿', title: 'Sustainability',color: '#06d6a0', bg: '#d1fae5', desc: 'Eco-friendly packaging and responsibly sourced ingredients for a better tomorrow.' },
-  { icon: '🚀', title: 'Innovation',    color: '#e63946', bg: '#ffe4e6', desc: 'Constantly pushing the boundaries of flavor and experience with bold, modern twists.' },
+  { Icon: Q, title: 'Quality',       color: '#f77f00', bg: '#fff3e0', desc: 'Premium ingredients, uncompromised production standards — the finest soda experience in every bottle.' },
+  { Icon: I, title: 'Integrity',     color: '#9b5de5', bg: '#f3e8ff', desc: 'Transparent, honest practices in everything we do — sourcing, bottling, delivery.' },
+  { Icon: S, title: 'Sustainability',color: '#06d6a0', bg: '#d1fae5', desc: 'Eco-friendly packaging and responsibly sourced ingredients for a better tomorrow.' },
+  { Icon: N, title: 'Innovation',    color: '#e63946', bg: '#ffe4e6', desc: 'Bold modern twists — constantly pushing the boundaries of flavor and experience.' },
 ]
 
 const FAQS = [
@@ -28,6 +35,137 @@ const FAQS = [
     a: 'IndiColas offers the same cultural nostalgia with the benefits of modern production — premium quality control, consistent flavor, eco-friendly materials, and 12 vibrant flavor options you simply cannot get from traditional Goli Soda vendors.',
   },
 ]
+
+/* 3D value card — desktop pointer tilt + universal scroll tilt for mobile */
+function ValueCard({ v, i }) {
+  const { isMobile } = useDevice()
+  const tiltRef = useTilt({ intensity: 13, scale: 1.04 })
+  const scrollRef = useScrollTilt({ amount: 5, axis: 'x', invert: i % 2 === 0 })
+  return (
+    <motion.div
+      initial={{ opacity:0, y:50 }} whileInView={{ opacity:1, y:0 }}
+      viewport={{ once:true, margin:'-50px' }} transition={{ duration:.65, delay:i*.1 }}
+      style={{ perspective: 1100, transformStyle: 'preserve-3d' }}
+    >
+      <div ref={scrollRef}>
+        <div
+          ref={isMobile ? null : tiltRef}
+          style={{
+            background:`linear-gradient(160deg, ${v.bg}, #fff 130%)`,
+            borderRadius:22,
+            padding:'2rem',
+            position:'relative',
+            overflow:'hidden',
+            border:`1px solid ${v.color}22`,
+            boxShadow:`0 14px 36px ${v.color}1a, 0 2px 8px ${v.color}0d`,
+            transition:'box-shadow .35s',
+            transformStyle: 'preserve-3d',
+            willChange: 'transform',
+          }}
+        >
+          {/* Faded background glyph */}
+          <span style={{
+            position:'absolute', bottom:-22, right:-12,
+            opacity:.07, color:v.color, lineHeight:1,
+            transform: 'translateZ(-10px)',
+          }}>
+            <v.Icon width={130} height={130} />
+          </span>
+
+          {/* Icon chip */}
+          <div style={{
+            width:56, height:56, borderRadius:16,
+            background:`linear-gradient(135deg, ${v.color}, ${v.color}cc)`,
+            display:'flex', alignItems:'center', justifyContent:'center',
+            color:'#fff', marginBottom:'1.2rem',
+            boxShadow:`0 10px 24px ${v.color}55, inset 0 1px 0 rgba(255,255,255,.3)`,
+            transform: 'translateZ(28px)',
+          }}>
+            <v.Icon width={24} height={24} />
+          </div>
+
+          <h3 style={{
+            fontFamily:"'Sora',sans-serif", fontWeight:700,
+            marginBottom:'.55rem', color:'#1a1a2e',
+            transform: 'translateZ(18px)',
+          }}>{v.title}</h3>
+          <p style={{
+            fontSize:'.9rem', color:'#6b7280', lineHeight:1.7,
+            transform: 'translateZ(8px)',
+          }}>{v.desc}</p>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* 3D bottle image with both hover-tilt (desktop) and scroll-tilt (universal) */
+function BottleImage({ src, alt, color, delay = 0, mt = 0 }) {
+  const { isMobile } = useDevice()
+  const tiltRef = useTilt({ intensity: 12, scale: 1.05 })
+  const scrollRef = useScrollTilt({ amount: 9, axis: 'x', invert: delay > 0 })
+  return (
+    <div ref={scrollRef} style={{ perspective: 1200, marginTop: mt }}>
+      <motion.div
+        ref={isMobile ? null : tiltRef}
+        animate={{ y:[0,-12,0] }}
+        transition={{ duration:3.5, repeat:Infinity, ease:'easeInOut', delay }}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        <img src={src} alt={alt}
+          style={{
+            width:'100%', borderRadius:24, objectFit:'contain',
+            filter:`drop-shadow(0 22px 44px ${color}55) drop-shadow(0 6px 16px ${color}30)`,
+          }} />
+      </motion.div>
+    </div>
+  )
+}
+
+/* Premium bottle showcase card with 3D tilt + scroll-driven rotation */
+function PremiumBottleCard({ b, i }) {
+  const { isMobile } = useDevice()
+  const tiltRef = useTilt({ intensity: 14, scale: 1.04 })
+  const scrollRef = useScrollTilt({ amount: 6, axis: 'y', invert: i % 2 === 1 })
+  return (
+    <motion.div
+      initial={{ opacity:0, y:50 }} whileInView={{ opacity:1, y:0 }}
+      viewport={{ once:true }} transition={{ duration:.7, delay:i*.12 }}
+      style={{ perspective: 1200 }}
+    >
+      <div ref={scrollRef}>
+        <div
+          ref={isMobile ? null : tiltRef}
+          style={{
+            background: `linear-gradient(160deg, ${b.bg}, #fff 140%)`,
+            borderRadius:26, padding:'2.4rem 1.5rem 1.6rem', textAlign:'center',
+            boxShadow:`0 22px 48px ${b.color}22, 0 4px 14px ${b.color}10`,
+            border: `1px solid ${b.color}1f`,
+            display:'flex', flexDirection:'column', alignItems:'center',
+            position: 'relative', overflow: 'hidden',
+            transformStyle: 'preserve-3d',
+          }}
+        >
+          {/* Top glow */}
+          <div style={{
+            position:'absolute', top:'-30%', left:'15%', width:'70%', height:'60%',
+            background: `radial-gradient(circle, ${b.color}30, transparent 65%)`,
+            filter: 'blur(20px)', pointerEvents:'none',
+          }} />
+          <motion.img src={b.img} alt={b.name}
+            animate={{ y:[0,-14,0] }} transition={{ duration:3+i*.4, repeat:Infinity, ease:'easeInOut' }}
+            style={{
+              height:280, objectFit:'contain', marginBottom:'1rem',
+              filter:`drop-shadow(0 24px 44px ${b.color}55) drop-shadow(0 6px 14px ${b.color}30)`,
+              transform: 'translateZ(40px)',
+              position:'relative', zIndex:1,
+            }} />
+          <h3 style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, color:b.color, transform:'translateZ(20px)' }}>{b.name}</h3>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false)
@@ -106,16 +244,12 @@ export default function AboutPage() {
               <Link to="/history" className="btn btn-primary">Explore Our History</Link>
             </motion.div>
 
-            {/* Tall bottle images */}
+            {/* Tall bottle images — 3D tilt + float (works on mobile via scroll-tilt) */}
             <motion.div initial={{ opacity:0, x:50 }} whileInView={{ opacity:1, x:0 }}
               viewport={{ once:true, margin:'-80px' }} transition={{ duration:.9 }}
               style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem' }}>
-              <motion.img src="/images/berry-punch-tall.png" alt="Berry Punch"
-                animate={{ y:[0,-10,0] }} transition={{ duration:3.5, repeat:Infinity, ease:'easeInOut' }}
-                style={{ width:'100%', borderRadius:20, objectFit:'contain', filter:'drop-shadow(0 16px 32px rgba(155,93,229,.3))' }} />
-              <motion.img src="/images/coco-berry-tall.png" alt="Coco Berry"
-                animate={{ y:[0,-10,0] }} transition={{ duration:3.5, repeat:Infinity, ease:'easeInOut', delay:.6 }}
-                style={{ width:'100%', borderRadius:20, objectFit:'contain', marginTop:'2.5rem', filter:'drop-shadow(0 16px 32px rgba(255,112,166,.3))' }} />
+              <BottleImage src="/images/berry-punch-tall.png" alt="Berry Punch" color="#9b5de5" />
+              <BottleImage src="/images/coco-berry-tall.png"  alt="Coco Berry"  color="#ff70a6" delay={0.6} mt="2.5rem" />
             </motion.div>
           </div>
         </div>
@@ -131,22 +265,12 @@ export default function AboutPage() {
               Premium Quality, <span className="grad">Every Bottle</span>
             </h2>
           </motion.div>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1.5rem' }}>
+          <div className="bottle-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'1.5rem' }}>
             {[
               { img:'/images/citrus-blast-tall.png', name:'Citrus Blast',  color:'#f77f00', bg:'#fff3e0' },
               { img:'/images/peach-punch-alt.png',   name:'Peach Punch',   color:'#ffb347', bg:'#fff8e1' },
               { img:'/images/ginger-lime-alt.png',   name:'Ginger Lime',   color:'#06d6a0', bg:'#d1fae5' },
-            ].map((b, i) => (
-              <motion.div key={b.name} initial={{ opacity:0, y:50 }} whileInView={{ opacity:1, y:0 }}
-                viewport={{ once:true }} transition={{ duration:.7, delay:i*.12 }}
-                style={{ background:b.bg, borderRadius:24, padding:'2rem 1.5rem', textAlign:'center',
-                  boxShadow:`0 8px 32px ${b.color}22`, display:'flex', flexDirection:'column', alignItems:'center' }}>
-                <motion.img src={b.img} alt={b.name}
-                  animate={{ y:[0,-12,0] }} transition={{ duration:3+i*.4, repeat:Infinity, ease:'easeInOut' }}
-                  style={{ height:280, objectFit:'contain', filter:`drop-shadow(0 20px 40px ${b.color}44)`, marginBottom:'1rem' }} />
-                <h3 style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, color:b.color }}>{b.name}</h3>
-              </motion.div>
-            ))}
+            ].map((b, i) => <PremiumBottleCard key={b.name} b={b} i={i} />)}
           </div>
         </div>
       </section>
@@ -161,21 +285,7 @@ export default function AboutPage() {
             <h2 style={{ fontSize:'clamp(2rem,4vw,3rem)' }}>Our <span className="grad">Core Values</span></h2>
           </motion.div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))', gap:'1.5rem' }}>
-            {VALUES.map((v, i) => (
-              <motion.div key={v.title} initial={{ opacity:0, y:50 }} whileInView={{ opacity:1, y:0 }}
-                viewport={{ once:true, margin:'-50px' }} transition={{ duration:.65, delay:i*.1 }}
-                whileHover={{ y:-8, boxShadow:`0 20px 48px ${v.color}28` }}
-                style={{ background:v.bg, borderRadius:20, padding:'2rem', position:'relative', overflow:'hidden', transition:'box-shadow .3s' }}>
-                <span style={{ position:'absolute', bottom:-10, right:-5, fontSize:'5.5rem', opacity:.1, lineHeight:1 }}>{v.icon}</span>
-                <div style={{
-                  width:50, height:50, borderRadius:14, background:v.color,
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  fontSize:'1.5rem', marginBottom:'1.2rem', boxShadow:`0 8px 20px ${v.color}55`,
-                }}>{v.icon}</div>
-                <h3 style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, marginBottom:'.5rem' }}>{v.title}</h3>
-                <p style={{ fontSize:'.9rem', color:'#6b7280', lineHeight:1.65 }}>{v.desc}</p>
-              </motion.div>
-            ))}
+            {VALUES.map((v, i) => <ValueCard key={v.title} v={v} i={i} />)}
           </div>
         </div>
       </section>

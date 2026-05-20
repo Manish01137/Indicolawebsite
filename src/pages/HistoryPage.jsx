@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
+import { useTilt, useDevice } from '../hooks/useTilt'
+import { useScrollTilt } from '../hooks/useScrollTilt'
+import { ArrowIcon } from '../components/SocialIcons'
 
 const TIMELINE = [
   {
@@ -70,59 +73,81 @@ function TimelineItem({ t, i }) {
   const ref    = useRef()
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const isEven = i % 2 === 0
+  const { isMobile } = useDevice()
+  const tiltRef = useTilt({ intensity: 10, scale: 1.025 })
+  const scrollRef = useScrollTilt({ amount: 6, axis: 'x', invert: !isEven })
 
   return (
-    <div ref={ref} style={{ display:'grid', gridTemplateColumns:'1fr 60px 1fr', gap:0, marginBottom:'3rem', alignItems:'start' }}>
+    <div ref={ref} className="timeline-row" style={{ display:'grid', gridTemplateColumns:'1fr 60px 1fr', gap:0, marginBottom:'3rem', alignItems:'start' }}>
       {/* Left */}
       <div style={{ paddingRight:'2rem', ...(isEven ? {} : { gridColumn:'3' }) }}>
         <motion.div
           initial={{ opacity:0, x: isEven ? -60 : 60 }}
           animate={inView ? { opacity:1, x:0 } : {}}
           transition={{ duration:.8, delay:i*.1 }}
-          style={{
-            background:'#fff', borderRadius:22, overflow:'hidden',
-            boxShadow:'0 8px 36px rgba(26,26,46,.09)', border:`2px solid ${t.color}22`,
-          }}
+          style={{ perspective: 1200 }}
         >
-          <div style={{ height:220, overflow:'hidden', position:'relative' }}>
-            <img src={t.img} alt={t.title}
-              style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center',
-                transition:'transform .5s' }}
-              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.06)'}
-              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-            />
-            <div style={{
-              position:'absolute', inset:0,
-              background:`linear-gradient(to top,${t.color}88,transparent)`,
-            }} />
-            <div className="tag" style={{
-              position:'absolute', top:'1rem', left:'1rem',
-              background: t.color, color:'#fff',
-            }}>{t.era}</div>
-          </div>
-          <div style={{ padding:'1.5rem' }}>
-            <div style={{ color:t.color, fontSize:'.78rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', marginBottom:'.4rem' }}>{t.sub}</div>
-            <h3 style={{ fontFamily:"'Sora',sans-serif", fontSize:'1.35rem', fontWeight:700, marginBottom:'.8rem' }}>{t.title}</h3>
-            <ul style={{ paddingLeft:0, listStyle:'none', display:'flex', flexDirection:'column', gap:'.4rem' }}>
-              {t.facts.map(f => (
-                <li key={f} style={{ display:'flex', gap:'.6rem', alignItems:'flex-start', fontSize:'.88rem', color:'#6b7280' }}>
-                  <span style={{ color:t.color, fontSize:'1rem', lineHeight:1.4, flexShrink:0 }}>→</span>
-                  {f}
-                </li>
-              ))}
-            </ul>
+          <div ref={scrollRef}>
+            <div
+              ref={isMobile ? null : tiltRef}
+              style={{
+                background:'#fff', borderRadius:24, overflow:'hidden',
+                boxShadow:`0 18px 48px ${t.color}22, 0 2px 10px ${t.color}12`,
+                border:`1px solid ${t.color}24`,
+                transformStyle: 'preserve-3d',
+                willChange: 'transform',
+              }}
+            >
+              <div style={{ height:240, overflow:'hidden', position:'relative' }}>
+                <img src={t.img} alt={t.title}
+                  style={{
+                    width:'100%', height:'100%',
+                    objectFit:'cover', objectPosition:'center',
+                    transition:'transform .8s cubic-bezier(.2,.7,.3,1)',
+                    transform: 'translateZ(20px)',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateZ(20px) scale(1.08)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'translateZ(20px) scale(1)'}
+                />
+                <div style={{
+                  position:'absolute', inset:0,
+                  background:`linear-gradient(to top,${t.color}aa 0%, ${t.color}33 35%, transparent 70%)`,
+                }} />
+                <div className="tag" style={{
+                  position:'absolute', top:'1rem', left:'1rem',
+                  background: t.color, color:'#fff',
+                  boxShadow:`0 6px 16px ${t.color}66`,
+                  transform: 'translateZ(35px)',
+                }}>{t.era}</div>
+              </div>
+              <div style={{ padding:'1.75rem 1.6rem' }}>
+                <div style={{ color:t.color, fontSize:'.78rem', fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', marginBottom:'.5rem' }}>{t.sub}</div>
+                <h3 style={{ fontFamily:"'Sora',sans-serif", fontSize:'1.4rem', fontWeight:700, marginBottom:'.9rem', letterSpacing:'-0.02em' }}>{t.title}</h3>
+                <ul style={{ paddingLeft:0, listStyle:'none', display:'flex', flexDirection:'column', gap:'.55rem' }}>
+                  {t.facts.map(f => (
+                    <li key={f} style={{ display:'flex', gap:'.7rem', alignItems:'flex-start', fontSize:'.9rem', color:'#4b5563', lineHeight:1.55 }}>
+                      <span style={{ color:t.color, flexShrink:0, marginTop:2 }}>
+                        <ArrowIcon size={14} />
+                      </span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>
 
       {/* Center line + dot */}
-      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', paddingTop:'2.5rem' }}>
+      <div className="timeline-spine" style={{ display:'flex', flexDirection:'column', alignItems:'center', paddingTop:'2.5rem' }}>
         <motion.div
           initial={{ scale:0 }} animate={inView ? { scale:1 } : {}}
           transition={{ duration:.5, delay:i*.1+.2 }}
           style={{
-            width:20, height:20, borderRadius:'50%',
-            background:t.color, boxShadow:`0 0 0 6px ${t.color}30`,
+            width:22, height:22, borderRadius:'50%',
+            background:`linear-gradient(135deg, ${t.color}, ${t.color}cc)`,
+            boxShadow:`0 0 0 6px ${t.color}24, 0 6px 16px ${t.color}55`,
             zIndex:2,
           }} />
         <div style={{ flex:1, width:2, background:`linear-gradient(to bottom,${t.color}50,transparent)` }} />
@@ -184,11 +209,13 @@ export default function HistoryPage() {
         </div>
       </section>
 
-      {/* Mobile timeline note */}
+      {/* Mobile timeline stack */}
       <style>{`
         @media(max-width:768px){
-          .timeline-grid{grid-template-columns:1fr!important}
-          .timeline-center{display:none!important}
+          .timeline-row{grid-template-columns:30px 1fr!important;gap:1rem!important}
+          .timeline-row > div:first-child{padding-right:0!important;grid-column:2!important}
+          .timeline-row > div:last-child{display:none!important}
+          .timeline-spine{grid-column:1!important;grid-row:1!important;padding-top:1.5rem!important}
         }
       `}</style>
     </>

@@ -8,7 +8,9 @@ import VideoCard       from '../components/VideoCard'
 import VideoLightbox   from '../components/VideoLightbox'
 import MagneticButton  from '../components/MagneticButton'
 import PopParticles    from '../components/PopParticles'
+import Testimonials    from '../components/Testimonials'
 import { useTilt, useDevice } from '../hooks/useTilt'
+import { useScrollTilt, useParallax } from '../hooks/useScrollTilt'
 import { playPop, playFizz, playClick } from '../hooks/useAudio'
 import { VIDEO_FLAVORS } from '../data/videos'
 
@@ -36,14 +38,18 @@ function Bubbles({ count = 18 }) {
 }
 
 function TiltImage({ src, mt = 0 }) {
-  const ref = useTilt({ intensity: 9, scale: 1.03 })
+  const tiltRef = useTilt({ intensity: 9, scale: 1.03 })
+  const scrollRef = useScrollTilt({ amount: 7, axis: 'x', invert: true })
   return (
-    <div ref={ref} style={{ marginTop: mt, perspective: 800 }}>
-      <img src={src} alt="" loading="lazy"
-        style={{
-          width:'100%', borderRadius:20, objectFit:'cover',
-          aspectRatio:'1', boxShadow:'0 12px 36px rgba(26,26,46,.12)',
-        }} />
+    <div ref={scrollRef} style={{ marginTop: mt, perspective: 1000 }}>
+      <div ref={tiltRef} style={{ transformStyle: 'preserve-3d' }}>
+        <img src={src} alt="" loading="lazy"
+          style={{
+            width:'100%', borderRadius:20, objectFit:'cover',
+            aspectRatio:'1',
+            boxShadow:'0 18px 48px rgba(26,26,46,.18), 0 4px 16px rgba(26,26,46,.08)',
+          }} />
+      </div>
     </div>
   )
 }
@@ -521,37 +527,38 @@ export default function HomePage() {
     return () => clearInterval(id)
   }, [popping])
 
-  /* GSAP entrance + STRONG pinned hero (desktop only) */
+  /* GSAP entrance + scroll-driven hero (desktop only).
+     Pinning is intentionally avoided: ScrollTrigger.pin wraps the trigger
+     in a pin-spacer div that survives ctx.revert(), which then causes
+     React to throw "Failed to execute 'removeChild'" on route change and
+     blanks every subsequent page. */
   useEffect(() => {
     const ctx = gsap.context(() => {
       const els = headRef.current?.querySelectorAll('.anim')
       if (els) gsap.from(els, { y: 60, opacity: 0, stagger: .1, duration: 1, ease: 'power4.out', delay: .25 })
 
-      /* Strong pinned scroll-driven hero — desktop only */
       if (typeof window !== 'undefined' && window.innerWidth >= 900) {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: heroRef.current,
-            pin: true,
             scrub: 1,
             start: 'top top',
-            end: '+=200%',
-            anticipatePin: 1,
+            end: 'bottom top',
             invalidateOnRefresh: true,
           }
         })
 
-        /* Scene 1 → 2 (0-50%): headline lifts, secondary glow fades in */
         tl.to(headRef.current, { y: -120, scale: 0.88, opacity: 0.55 }, 0)
           .to(heroBgRef.current, { opacity: 1 }, 0.2)
-
-        /* Scene 2 → 3 (50-100%): continue text appears */
-        tl.from(continueRef.current, { opacity: 0, y: 80 }, 0.6)
+          .from(continueRef.current, { opacity: 0, y: 80 }, 0.6)
           .to(continueRef.current, { y: 0 }, 0.6)
       }
     }, heroRef)
 
-    return () => ctx.revert()
+    return () => {
+      ScrollTrigger.getAll().forEach(t => t.kill())
+      ctx.revert()
+    }
   }, [])
 
   const featured = VIDEO_FLAVORS[activeHero]
@@ -885,6 +892,9 @@ export default function HomePage() {
           <Link to="/flavors" className="btn btn-white" onClick={() => playClick()}>Explore All Flavors →</Link>
         </div>
       </section>
+
+      {/* ══════════════════════════════════ TESTIMONIALS — REAL REVIEW VIDEOS ═══ */}
+      <Testimonials />
 
       {/* ══════════════════════════════════ STATS ═══ */}
       <section style={{
