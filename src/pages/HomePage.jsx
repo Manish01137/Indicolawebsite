@@ -9,6 +9,8 @@ import VideoLightbox   from '../components/VideoLightbox'
 import MagneticButton  from '../components/MagneticButton'
 import PopParticles    from '../components/PopParticles'
 import Testimonials    from '../components/Testimonials'
+import HeroBottleScene from '../three/HeroBottleScene'
+import BottleAssemblySection from '../three/BottleAssemblyScene'
 import { useTilt, useDevice } from '../hooks/useTilt'
 import { useScrollTilt, useParallax } from '../hooks/useScrollTilt'
 import { playPop, playFizz, playClick } from '../hooks/useAudio'
@@ -586,19 +588,19 @@ export default function HomePage() {
         transition: 'background 1s ease',
         paddingTop: 'var(--nav-h)',
       }}>
-        {/* Cinematic background videos — crossfade through all 4 flavors */}
-        <BackgroundVideos
-          activeIdx={activeHero}
+        {/* Interactive 3D Bottle Scene — replaces background video */}
+        <HeroBottleScene
+          liquidColor={featured.color}
+          accent={featured.color}
           isMobile={isMobile}
-          fallbackBg={`linear-gradient(135deg, #fff8f0 0%, ${featured.light} 50%, #fdf4ff 100%)`}
         />
 
-        {/* Directional overlay — opaque on LEFT (text area), clear on RIGHT (video visible) */}
+        {/* Soft directional overlay — keeps text readable, bottle clearly visible */}
         <div style={{
           position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
           background: isMobile
-            ? `linear-gradient(180deg, rgba(255,253,245,.78) 0%, rgba(255,250,240,.65) 50%, rgba(255,250,240,.45) 100%)`
-            : `linear-gradient(95deg, rgba(255,253,245,.96) 0%, rgba(255,250,240,.88) 28%, rgba(255,250,240,.45) 52%, rgba(255,250,240,.15) 76%, rgba(255,250,240,.22) 100%)`,
+            ? `linear-gradient(180deg, rgba(255,253,245,.55) 0%, rgba(255,250,240,.25) 50%, rgba(255,250,240,.18) 100%)`
+            : `linear-gradient(95deg, rgba(255,253,245,.92) 0%, rgba(255,250,240,.7) 28%, rgba(255,250,240,.22) 52%, rgba(255,250,240,.05) 76%, rgba(255,250,240,.1) 100%)`,
           transition: 'background .8s ease',
         }} />
 
@@ -735,6 +737,13 @@ export default function HomePage() {
         speed={32}
         color="#e63946"
         textColor="#fff"
+      />
+
+      {/* ═══════════════════════════════════════ BOTTLE ASSEMBLY (3D SCROLL STORY) ════ */}
+      <BottleAssemblySection
+        liquidColor={featured.color}
+        accent={featured.color}
+        isMobile={isMobile}
       />
 
       {/* ═══════════════════════════════════════ WATCH THE FIZZ — 3D VIDEO WALL ════ */}
