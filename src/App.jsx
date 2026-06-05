@@ -1,21 +1,22 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import Lenis from 'lenis'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import Navbar          from './components/Navbar'
-import Footer          from './components/Footer'
-import Preloader       from './components/Preloader'
-import CustomCursor    from './components/CustomCursor'
-import PageWipe        from './components/PageWipe'
-import AudioToggle     from './components/AudioToggle'
+import Navbar      from './components/Navbar'
+import Footer      from './components/Footer'
+import Preloader   from './components/Preloader'
+import PageWipe    from './components/PageWipe'
+import AudioToggle from './components/AudioToggle'
 
-import HomePage    from './pages/HomePage'
-import AboutPage   from './pages/AboutPage'
-import HistoryPage from './pages/HistoryPage'
-import FlavorsPage from './pages/FlavorsPage'
-import ContactPage from './pages/ContactPage'
+import HomePage from './pages/HomePage'
+
+/* Lazy-loaded inner pages for faster initial load */
+const AboutPage   = lazy(() => import('./pages/AboutPage'))
+const HistoryPage = lazy(() => import('./pages/HistoryPage'))
+const FlavorsPage = lazy(() => import('./pages/FlavorsPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -23,6 +24,23 @@ function ScrollToTop() {
   const { pathname } = useLocation()
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
   return null
+}
+
+function RouteFallback() {
+  return (
+    <div style={{
+      minHeight: '60vh',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      paddingTop: 'var(--nav-h)',
+    }}>
+      <div style={{
+        width: 38, height: 38, borderRadius: '50%',
+        border: '3px solid rgba(230,57,70,.15)',
+        borderTopColor: '#e63946',
+        animation: 'spin .8s linear infinite',
+      }} />
+    </div>
+  )
 }
 
 export default function App() {
@@ -48,7 +66,6 @@ export default function App() {
     }
   }, [loading])
 
-  /* Mark loaded so preloader doesn't reappear on route changes */
   const handlePreloadComplete = () => {
     sessionStorage.setItem('indicolas-loaded', '1')
     setLoading(false)
@@ -57,7 +74,6 @@ export default function App() {
   return (
     <>
       {loading && <Preloader onComplete={handlePreloadComplete} />}
-      <CustomCursor />
       <PageWipe />
       <AudioToggle />
 
@@ -65,11 +81,11 @@ export default function App() {
       <Navbar />
       <main style={{ opacity: loading ? 0 : 1, transition: 'opacity .4s ease' }}>
         <Routes>
-          <Route path="/"        element={<HomePage />} />
-          <Route path="/about"   element={<AboutPage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/flavors" element={<FlavorsPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about"   element={<Suspense fallback={<RouteFallback />}><AboutPage   /></Suspense>} />
+          <Route path="/history" element={<Suspense fallback={<RouteFallback />}><HistoryPage /></Suspense>} />
+          <Route path="/flavors" element={<Suspense fallback={<RouteFallback />}><FlavorsPage /></Suspense>} />
+          <Route path="/contact" element={<Suspense fallback={<RouteFallback />}><ContactPage /></Suspense>} />
         </Routes>
       </main>
       <Footer />

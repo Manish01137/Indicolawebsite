@@ -118,26 +118,31 @@ h1,h2,h3,h4,h5,h6{font-family:'Sora',sans-serif;line-height:1.08;letter-spacing:
 video{display:block;background:#000}
 video::-webkit-media-controls-overlay-play-button{display:none}
 
-/* Responsive */
-@media(max-width:900px){.container{padding:0 1.25rem}}
-@media(max-width:768px){
+/* ─── Responsive — desktop ≥ 900, mobile-first tweaks below ─── */
+@media(max-width:899px){
+  .container{padding:0 1.25rem}
   .hide-sm{display:none!important}.show-sm{display:flex!important}
   .page-hero{padding:calc(var(--nav-h) + 2rem) 0 3rem}
-  .page-hero h1{font-size:clamp(2.2rem,8vw,3.2rem)}
-  .page-hero p{font-size:1rem;padding:0 1rem}
-  .btn{padding:.75rem 1.5rem;font-size:.9rem}
-  .label{font-size:.7rem;letter-spacing:.12em}
-  section{padding:4rem 0!important}
+  .page-hero h1{font-size:clamp(2rem,8vw,3rem);padding:0 .5rem}
+  .page-hero p{font-size:.95rem;padding:0 1rem;line-height:1.65}
+  .btn{padding:.85rem 1.6rem;font-size:.9rem;min-height:44px}
+  .label{font-size:.68rem;letter-spacing:.14em}
+  section{padding:clamp(3rem,7vw,4.5rem) 0!important}
+  h1,h2,h3{letter-spacing:-0.02em}
+  /* Tap-friendly form inputs on mobile */
+  input,textarea,select,button{font-size:16px!important}
+  /* Slightly smaller gap inside cards */
+  .card{border-radius:18px}
 }
-@media(max-width:480px){
+@media(max-width:600px){
   .container{padding:0 1rem}
+  .btn{width:auto;padding:.85rem 1.4rem}
+  h1{font-size:clamp(1.85rem,8.5vw,2.6rem)}
+  h2{font-size:clamp(1.6rem,7vw,2.2rem)}
 }
-
-/* Custom cursor — hide system cursor on hover-capable devices */
-@media(hover:hover) and (pointer:fine){
-  html, html *{cursor:none!important}
-  /* Restore caret for text inputs */
-  input[type="text"],input[type="email"],input[type="tel"],input[type="password"],input[type="search"],textarea,[contenteditable="true"]{cursor:text!important}
+@media(max-width:380px){
+  .container{padding:0 .85rem}
+  section{padding:2.5rem 0!important}
 }
 
 /* Touch devices — disable 3D tilt globally for safety */

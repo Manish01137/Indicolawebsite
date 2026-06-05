@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -9,6 +9,8 @@ import VideoLightbox   from '../components/VideoLightbox'
 import MagneticButton  from '../components/MagneticButton'
 import PopParticles    from '../components/PopParticles'
 import Testimonials    from '../components/Testimonials'
+import { lazy, Suspense as LazySuspense } from 'react'
+const SodaBottleScene = lazy(() => import('../three/SodaBottleScene'))
 import { useTilt, useDevice } from '../hooks/useTilt'
 import { useScrollTilt, useParallax } from '../hooks/useScrollTilt'
 import { playPop, playFizz, playClick } from '../hooks/useAudio'
@@ -508,6 +510,89 @@ function VideoCarousel({ onCardClick }) {
   )
 }
 
+/* ─────────── SIGNATURE 3D PHASES + TEXT BLOCK ─────────── */
+const SIG_PHASES = [
+  {
+    eyebrow: 'Our Signature',
+    title:   'Frozen In Time.',
+    sub:     'A moment captured — the splash, the marble, the iconic Goli Soda bottle suspended in mid-air. This is what bold tastes like.',
+    cta:     null,
+  },
+  {
+    eyebrow: 'Heritage Since 1872',
+    title:   'The Codd-Neck Original.',
+    sub:     'Invented in Victorian England, perfected on the streets of India. A glass marble seal preserves the carbonation — and unleashes that unforgettable pop.',
+    cta:     null,
+  },
+  {
+    eyebrow: '12 Vibrant Flavors',
+    title:   'Bold Desi Energy.',
+    sub:     'Cherry. Coco. Lime. Candy. Each flavor is a story — and the ingredients are right here, frozen around the bottle.',
+    cta:     null,
+  },
+  {
+    eyebrow: 'Ready To Pop',
+    title:   'Pop The Fizz.',
+    sub:     'Premium ingredients, eco-friendly bottling, all-American delivery. Tap a flavor below to taste the difference.',
+    cta:     'Explore Flavors →',
+  },
+]
+
+function DioramaTextBlock({ phase, accent, onCta }) {
+  if (!phase) return null
+  return (
+    <>
+      <span style={{
+        display: 'inline-block',
+        fontFamily: "'Sora',sans-serif",
+        fontSize: '.72rem', fontWeight: 700,
+        letterSpacing: '.18em', textTransform: 'uppercase',
+        color: accent, marginBottom: '1rem',
+        padding: '.4rem 1rem',
+        background: '#fff', borderRadius: 9999,
+        boxShadow: `0 4px 16px ${accent}22`,
+        transition: 'color 1s, box-shadow 1s',
+      }}>
+        {phase.eyebrow}
+      </span>
+
+      <h2 style={{
+        fontSize: 'clamp(2.2rem, 5.5vw, 4rem)',
+        marginBottom: '1.2rem',
+        letterSpacing: '-0.03em',
+        lineHeight: 1.05,
+      }}>
+        <span style={{
+          background: `linear-gradient(135deg, ${accent}, #f77f00)`,
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+          transition: 'background 1s',
+        }}>
+          {phase.title}
+        </span>
+      </h2>
+
+      <p style={{
+        fontSize: 'clamp(.98rem, 1.4vw, 1.1rem)',
+        color: '#4b5563', lineHeight: 1.75,
+        maxWidth: 460, margin: '0 0 1.6rem',
+      }}>
+        {phase.sub}
+      </p>
+
+      {phase.cta && (
+        <Link
+          to="/flavors"
+          className="btn btn-primary"
+          onClick={onCta}
+          style={{ fontSize: '1rem', padding: '1rem 2.2rem' }}
+        >
+          {phase.cta}
+        </Link>
+      )}
+    </>
+  )
+}
+
 /* ─────────── HOME PAGE ─────────── */
 export default function HomePage() {
   const heroRef     = useRef()
@@ -519,6 +604,40 @@ export default function HomePage() {
   const [lightbox, setLightbox]     = useState(null)
   const [popping, setPopping]       = useState(false)
   const { isMobile } = useDevice()
+
+  /* Signature 3D bottle section — sticky pin replacement (no GSAP pin) */
+  const signatureRef    = useRef(null)
+  const sigProgressRef  = useRef(0)
+  const [sigPhase, setSigPhase]       = useState(0)
+  const [sigProgress, setSigProgress] = useState(0)
+
+  useEffect(() => {
+    if (isMobile) return
+    let raf = null
+    const update = () => {
+      raf = null
+      const el = signatureRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const total = rect.height - window.innerHeight
+      const scrolled = -rect.top
+      const p = total > 0 ? Math.max(0, Math.min(1, scrolled / total)) : 0
+      sigProgressRef.current = p
+      setSigProgress(p)
+      const phase = Math.min(3, Math.floor(p * 4 - 1e-6))
+      const safePhase = phase < 0 ? 0 : phase
+      setSigPhase(prev => prev !== safePhase ? safePhase : prev)
+    }
+    const onScroll = () => { if (raf == null) raf = requestAnimationFrame(update) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+    update()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [isMobile])
 
   /* Auto-rotate hero — paused while popping */
   useEffect(() => {
@@ -586,22 +705,6 @@ export default function HomePage() {
         transition: 'background 1s ease',
         paddingTop: 'var(--nav-h)',
       }}>
-        {/* Cinematic background videos — crossfade through all 4 flavors */}
-        <BackgroundVideos
-          activeIdx={activeHero}
-          isMobile={isMobile}
-          fallbackBg={`linear-gradient(135deg, #fff8f0 0%, ${featured.light} 50%, #fdf4ff 100%)`}
-        />
-
-        {/* Directional overlay — opaque on LEFT (text area), clear on RIGHT (video visible) */}
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background: isMobile
-            ? `linear-gradient(180deg, rgba(255,253,245,.78) 0%, rgba(255,250,240,.65) 50%, rgba(255,250,240,.45) 100%)`
-            : `linear-gradient(95deg, rgba(255,253,245,.96) 0%, rgba(255,250,240,.88) 28%, rgba(255,250,240,.45) 52%, rgba(255,250,240,.15) 76%, rgba(255,250,240,.22) 100%)`,
-          transition: 'background .8s ease',
-        }} />
-
         {/* Secondary background that fades in during pin scene 3 */}
         <div ref={heroBgRef} style={{
           position: 'absolute', inset: 0,
@@ -729,6 +832,181 @@ export default function HomePage() {
         </svg>
       </section>
 
+      {/* ═══════════════════════════════════════ SIGNATURE 3D BOTTLE — Splash Diorama (sticky pin) ════ */}
+      <section
+        ref={signatureRef}
+        style={{
+          position: 'relative',
+          height: isMobile ? 'auto' : '250vh',  /* 1 viewport visible + 150% scroll-through */
+          background: `linear-gradient(180deg, #fff 0%, ${featured.light} 50%, #fff5e8 100%)`,
+          transition: 'background 1s ease',
+        }}
+      >
+        <div
+          className="diorama-sticky"
+          style={{
+            position: isMobile ? 'relative' : 'sticky',
+            top: 0,
+            height: isMobile ? 'auto' : '100vh',
+            width: '100%',
+            overflow: 'hidden',
+            display: 'flex', alignItems: 'center',
+            padding: isMobile ? '4rem 0 3rem' : 0,
+          }}
+        >
+          {/* Ambient blobs */}
+          <div style={{
+            position: 'absolute', width: 500, height: 500,
+            top: '-15%', left: '-8%', borderRadius: '50%',
+            background: `radial-gradient(circle, ${featured.glow}, transparent 70%)`,
+            filter: 'blur(70px)', pointerEvents: 'none', zIndex: 0,
+            transition: 'background 1s',
+          }} />
+          <div style={{
+            position: 'absolute', width: 380, height: 380,
+            bottom: '-10%', right: '-5%', borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(155,93,229,.22), transparent 70%)',
+            filter: 'blur(70px)', pointerEvents: 'none', zIndex: 0,
+          }} />
+
+          {/* 3D Diorama Canvas — fills right half on desktop, full on mobile */}
+          <div
+            className="diorama-canvas"
+            style={{
+              position: isMobile ? 'relative' : 'absolute',
+              right: 0, top: 0, bottom: 0,
+              width: isMobile ? '100%' : '55%',
+              height: isMobile ? 'clamp(360px, 56vh, 500px)' : '100%',
+              order: isMobile ? -1 : 0,
+            }}
+          >
+            {/* Glow halo behind bottle */}
+            <div style={{
+              position: 'absolute', inset: '10%',
+              borderRadius: '50%',
+              background: `radial-gradient(circle, ${featured.glow}, transparent 65%)`,
+              filter: 'blur(50px)', opacity: 0.85,
+              pointerEvents: 'none', zIndex: 0,
+              transition: 'background 1s',
+            }} />
+            <LazySuspense fallback={
+              <div style={{
+                position: 'absolute', inset: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#9ca3af', fontSize: '.85rem',
+              }}>Loading splash…</div>
+            }>
+              <SodaBottleScene
+                accent={featured.color}
+                flavorName={featured.name}
+                progressRef={sigProgressRef}
+                isMobile={isMobile}
+              />
+            </LazySuspense>
+          </div>
+
+          {/* Left — phase-based text overlay */}
+          <div
+            className="container diorama-text-wrap"
+            style={{
+              position: 'relative', zIndex: 2,
+              width: '100%',
+              display: 'grid',
+              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+              alignItems: 'center',
+              minHeight: isMobile ? 'auto' : '100vh',
+            }}
+          >
+            <div className="diorama-text" style={{
+              paddingRight: isMobile ? 0 : '2rem',
+              textAlign: isMobile ? 'center' : 'left',
+            }}>
+              {isMobile ? (
+                /* Mobile: single static block */
+                <DioramaTextBlock
+                  phase={SIG_PHASES[0]}
+                  accent={featured.color}
+                  onCta={() => playClick()}
+                />
+              ) : (
+                /* Desktop: phase-switching with AnimatePresence */
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={sigPhase}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.55, ease: [0.2, 0.7, 0.3, 1] }}
+                  >
+                    <DioramaTextBlock
+                      phase={SIG_PHASES[sigPhase]}
+                      accent={featured.color}
+                      onCta={() => playClick()}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              )}
+
+              {/* Phase progress dots — desktop only */}
+              {!isMobile && (
+                <div style={{
+                  display: 'flex', gap: '.5rem',
+                  marginTop: '2.5rem',
+                  alignItems: 'center',
+                }}>
+                  {SIG_PHASES.map((_, i) => (
+                    <div key={i} style={{
+                      width: i === sigPhase ? 36 : 10,
+                      height: 4,
+                      borderRadius: 9999,
+                      background: i <= sigPhase ? featured.color : 'rgba(26,26,46,.14)',
+                      transition: 'width .45s, background .55s',
+                    }} />
+                  ))}
+                  <span style={{
+                    marginLeft: '.7rem',
+                    fontFamily: "'Sora',sans-serif",
+                    fontSize: '.7rem', fontWeight: 700,
+                    letterSpacing: '.16em', textTransform: 'uppercase',
+                    color: featured.color,
+                    transition: 'color 1s',
+                  }}>
+                    {Math.round(sigProgress * 100)}% · Step {sigPhase + 1}/4
+                  </span>
+                </div>
+              )}
+            </div>
+            {/* Right column empty on desktop — canvas occupies it absolutely */}
+            <div />
+          </div>
+
+          {/* Scroll hint (only when at top of section, desktop) */}
+          {!isMobile && sigProgress < 0.05 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1, y: [0, 5, 0] }}
+              transition={{ opacity: { duration: 0.6 }, y: { duration: 1.6, repeat: Infinity } }}
+              style={{
+                position: 'absolute', bottom: '2rem', left: '50%',
+                transform: 'translateX(-50%)',
+                fontFamily: "'Sora',sans-serif",
+                fontSize: '.72rem', fontWeight: 700,
+                letterSpacing: '.18em', textTransform: 'uppercase',
+                color: '#9ca3af', zIndex: 3,
+              }}
+            >
+              ↓ Scroll to explore
+            </motion.div>
+          )}
+        </div>
+
+        <style>{`
+          @media(max-width: 900px) {
+            .diorama-text-wrap { grid-template-columns: 1fr !important; }
+          }
+        `}</style>
+      </section>
+
       {/* ═══════════════════════════════════════ MARQUEE STRIP ════ */}
       <MarqueeStrip
         items={['POP THE FIZZ', 'BOLD DESI FLAVORS', 'BORN FROM BANTA', '12 VIBRANT FLAVORS', 'CRAFTED FOR THE BOLD']}
@@ -737,59 +1015,8 @@ export default function HomePage() {
         textColor="#fff"
       />
 
-      {/* ═══════════════════════════════════════ WATCH THE FIZZ — 3D VIDEO WALL ════ */}
-      <section style={{ background: '#fff', padding: '4rem 0 5rem', position: 'relative', overflow: 'hidden' }}>
-        <div className="blob" style={{ width: 400, height: 400, top: '5%', left: '-10%', background: 'rgba(230,57,70,.1)' }} />
-        <div className="blob" style={{ width: 350, height: 350, bottom: '0', right: '-5%', background: 'rgba(155,93,229,.1)', animationDelay: '-3s' }} />
-
-        <div className="container" style={{ position: 'relative', zIndex: 1 }}>
-          <motion.div initial={{ opacity:0, y:40 }} whileInView={{ opacity:1, y:0 }}
-            viewport={{ once:true, margin:'-80px' }} transition={{ duration:.8 }}
-            style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-            <span className="label" style={{ justifyContent: 'center' }}>The IndiColas Experience</span>
-            <h2 style={{ fontSize: 'clamp(2.2rem,5vw,3.6rem)', marginBottom: '1rem' }}>
-              Watch The <span className="grad">Fizz</span>
-            </h2>
-            <p style={{ color: '#6b7280', maxWidth: 520, margin: '0 auto', fontSize: '1.05rem', lineHeight: 1.7 }}>
-              Tilt, hover, click. Experience each flavor as a cinematic moment. Bold flavors deserve bold stories.
-            </p>
-          </motion.div>
-
-          <div className="video-wall" style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-            gap: '1.75rem',
-          }}>
-            {VIDEO_FLAVORS.map((v, i) => (
-              <motion.div key={v.name}
-                initial={{ opacity:0, y:60 }} whileInView={{ opacity:1, y:0 }}
-                viewport={{ once:true, margin:'-50px' }}
-                transition={{ duration:.7, delay: i * .1 }}
-                data-cursor="video"
-                onClick={() => playClick()}
-              >
-                <VideoCard
-                  src={v.video}
-                  poster={v.poster}
-                  name={v.name}
-                  tagline={v.tagline}
-                  color={v.color}
-                  glow={v.glow}
-                  height={isMobile ? 380 : 460}
-                  tiltIntensity={18}
-                  onClick={() => { playClick(); setLightbox(v) }}
-                />
-              </motion.div>
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-            <Link to="/flavors" className="btn btn-primary" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }} onClick={() => playClick()}>
-              View All 12 Flavors →
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ═══════════════════════════════════════ TESTIMONIALS (replaces Watch The Fizz) ════ */}
+      <Testimonials />
 
       {/* ═══════════════════════════════════════ CINEMATIC CAROUSEL ════ */}
       <section style={{
@@ -892,9 +1119,6 @@ export default function HomePage() {
           <Link to="/flavors" className="btn btn-white" onClick={() => playClick()}>Explore All Flavors →</Link>
         </div>
       </section>
-
-      {/* ══════════════════════════════════ TESTIMONIALS — REAL REVIEW VIDEOS ═══ */}
-      <Testimonials />
 
       {/* ══════════════════════════════════ STATS ═══ */}
       <section style={{

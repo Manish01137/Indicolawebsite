@@ -233,18 +233,6 @@ export default function FlavorsPage() {
         </svg>
       </section>
 
-      {/* All flavors banner */}
-      <section style={{ background: '#fffdf5', padding: '3rem 0 0' }}>
-        <div className="container">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }} transition={{ duration: .8 }}
-            style={{ borderRadius: 28, overflow: 'hidden', boxShadow: '0 20px 60px rgba(26,26,46,.1)' }}>
-            <img src="/images/all-flavors.png" alt="All IndiColas flavors" loading="lazy"
-              style={{ width: '100%', display: 'block', objectFit: 'cover', maxHeight: 380 }} />
-          </motion.div>
-        </div>
-      </section>
-
       {/* Filter + grid */}
       <section style={{ background: '#fffdf5', padding: '4rem 0 6rem' }}>
         <div className="container">
