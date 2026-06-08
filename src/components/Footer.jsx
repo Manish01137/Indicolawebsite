@@ -64,9 +64,17 @@ export default function Footer() {
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }} transition={{ duration: 0.7 }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '.7rem', marginBottom: '1.2rem' }}>
-              <img src="/images/logo.png" alt="IndiColas"
-                style={{ height: 50, filter: 'brightness(10)' }} />
+            <div style={{ display: 'inline-flex', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                padding: '.55rem 1.1rem',
+                background: '#fff',
+                borderRadius: 14,
+                boxShadow: '0 8px 24px rgba(0,0,0,.25)',
+              }}>
+                <img src="/images/logo.png" alt="IndiColas"
+                  style={{ height: 44, width: 'auto', objectFit: 'contain', display: 'block' }} />
+              </div>
             </div>
             <p style={{ color: 'rgba(255,255,255,.55)', lineHeight: 1.8, fontSize: '.92rem', maxWidth: 320, marginBottom: '1.8rem' }}>
               Heritage-inspired sodas bringing India's iconic Goli Soda culture to the USA — crafted with premium ingredients and 12 vibrant, bold flavors.

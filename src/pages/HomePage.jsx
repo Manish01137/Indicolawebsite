@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { motion, useInView } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -9,8 +9,6 @@ import VideoLightbox   from '../components/VideoLightbox'
 import MagneticButton  from '../components/MagneticButton'
 import PopParticles    from '../components/PopParticles'
 import Testimonials    from '../components/Testimonials'
-import { lazy, Suspense as LazySuspense } from 'react'
-const SodaBottleScene = lazy(() => import('../three/SodaBottleScene'))
 import { useTilt, useDevice } from '../hooks/useTilt'
 import { useScrollTilt, useParallax } from '../hooks/useScrollTilt'
 import { playPop, playFizz, playClick } from '../hooks/useAudio'
@@ -57,6 +55,70 @@ function TiltImage({ src, mt = 0 }) {
 }
 
 /* ─────────── BACKGROUND VIDEOS — seamless crossfade between two slots ─────────── */
+/* ─────────── HERO CYCLING IMAGES — crossfades through cola1/2/3 ─────────── */
+const HERO_IMAGES = [
+  '/images/homepagephoto/cola1.png',
+  '/images/homepagephoto/cola2.png',
+  '/images/homepagephoto/cola3.png',
+]
+
+function HeroCycleBg({ isMobile }) {
+  const [active, setActive] = useState(0)
+  useEffect(() => {
+    /* Preload all three so swaps are instant */
+    HERO_IMAGES.forEach(src => { const i = new Image(); i.src = src })
+    const id = setInterval(() => {
+      setActive(a => (a + 1) % HERO_IMAGES.length)
+    }, 6000)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <>
+      {HERO_IMAGES.map((src, i) => (
+        <div key={src} style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          backgroundImage: `url(${src})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: i === active ? 1 : 0,
+          transform: i === active ? 'scale(1)' : 'scale(1.05)',
+          transition: 'opacity 1.6s ease-in-out, transform 8s ease-out',
+          willChange: 'opacity, transform',
+        }} />
+      ))}
+      {/* Readability overlay — opaque on text side, clear on visual side */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
+        background: isMobile
+          ? 'linear-gradient(180deg, rgba(255,253,245,.78) 0%, rgba(255,250,240,.5) 50%, rgba(255,250,240,.35) 100%)'
+          : 'linear-gradient(95deg, rgba(255,253,245,.94) 0%, rgba(255,250,240,.82) 28%, rgba(255,250,240,.4) 55%, rgba(255,250,240,.1) 80%, rgba(255,250,240,.15) 100%)',
+      }} />
+
+      {/* Slide indicator dots */}
+      <div style={{
+        position: 'absolute', bottom: 'clamp(1.5rem,3vw,2.5rem)',
+        right: 'clamp(1.5rem,3vw,2.5rem)',
+        zIndex: 5, display: 'flex', gap: '.5rem',
+      }}>
+        {HERO_IMAGES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            aria-label={`Show image ${i+1}`}
+            style={{
+              width: i === active ? 28 : 9, height: 9, borderRadius: 9999,
+              background: i === active ? '#e63946' : 'rgba(26,26,46,.22)',
+              border: 'none', cursor: 'pointer', padding: 0,
+              transition: 'width .4s, background .4s',
+            }}
+          />
+        ))}
+      </div>
+    </>
+  )
+}
+
 function BackgroundVideos({ activeIdx, isMobile, fallbackBg }) {
   const refA = useRef(null)
   const refB = useRef(null)
@@ -510,89 +572,6 @@ function VideoCarousel({ onCardClick }) {
   )
 }
 
-/* ─────────── SIGNATURE 3D PHASES + TEXT BLOCK ─────────── */
-const SIG_PHASES = [
-  {
-    eyebrow: 'Our Signature',
-    title:   'Frozen In Time.',
-    sub:     'A moment captured — the splash, the marble, the iconic Goli Soda bottle suspended in mid-air. This is what bold tastes like.',
-    cta:     null,
-  },
-  {
-    eyebrow: 'Heritage Since 1872',
-    title:   'The Codd-Neck Original.',
-    sub:     'Invented in Victorian England, perfected on the streets of India. A glass marble seal preserves the carbonation — and unleashes that unforgettable pop.',
-    cta:     null,
-  },
-  {
-    eyebrow: '12 Vibrant Flavors',
-    title:   'Bold Desi Energy.',
-    sub:     'Cherry. Coco. Lime. Candy. Each flavor is a story — and the ingredients are right here, frozen around the bottle.',
-    cta:     null,
-  },
-  {
-    eyebrow: 'Ready To Pop',
-    title:   'Pop The Fizz.',
-    sub:     'Premium ingredients, eco-friendly bottling, all-American delivery. Tap a flavor below to taste the difference.',
-    cta:     'Explore Flavors →',
-  },
-]
-
-function DioramaTextBlock({ phase, accent, onCta }) {
-  if (!phase) return null
-  return (
-    <>
-      <span style={{
-        display: 'inline-block',
-        fontFamily: "'Sora',sans-serif",
-        fontSize: '.72rem', fontWeight: 700,
-        letterSpacing: '.18em', textTransform: 'uppercase',
-        color: accent, marginBottom: '1rem',
-        padding: '.4rem 1rem',
-        background: '#fff', borderRadius: 9999,
-        boxShadow: `0 4px 16px ${accent}22`,
-        transition: 'color 1s, box-shadow 1s',
-      }}>
-        {phase.eyebrow}
-      </span>
-
-      <h2 style={{
-        fontSize: 'clamp(2.2rem, 5.5vw, 4rem)',
-        marginBottom: '1.2rem',
-        letterSpacing: '-0.03em',
-        lineHeight: 1.05,
-      }}>
-        <span style={{
-          background: `linear-gradient(135deg, ${accent}, #f77f00)`,
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-          transition: 'background 1s',
-        }}>
-          {phase.title}
-        </span>
-      </h2>
-
-      <p style={{
-        fontSize: 'clamp(.98rem, 1.4vw, 1.1rem)',
-        color: '#4b5563', lineHeight: 1.75,
-        maxWidth: 460, margin: '0 0 1.6rem',
-      }}>
-        {phase.sub}
-      </p>
-
-      {phase.cta && (
-        <Link
-          to="/flavors"
-          className="btn btn-primary"
-          onClick={onCta}
-          style={{ fontSize: '1rem', padding: '1rem 2.2rem' }}
-        >
-          {phase.cta}
-        </Link>
-      )}
-    </>
-  )
-}
-
 /* ─────────── HOME PAGE ─────────── */
 export default function HomePage() {
   const heroRef     = useRef()
@@ -604,40 +583,6 @@ export default function HomePage() {
   const [lightbox, setLightbox]     = useState(null)
   const [popping, setPopping]       = useState(false)
   const { isMobile } = useDevice()
-
-  /* Signature 3D bottle section — sticky pin replacement (no GSAP pin) */
-  const signatureRef    = useRef(null)
-  const sigProgressRef  = useRef(0)
-  const [sigPhase, setSigPhase]       = useState(0)
-  const [sigProgress, setSigProgress] = useState(0)
-
-  useEffect(() => {
-    if (isMobile) return
-    let raf = null
-    const update = () => {
-      raf = null
-      const el = signatureRef.current
-      if (!el) return
-      const rect = el.getBoundingClientRect()
-      const total = rect.height - window.innerHeight
-      const scrolled = -rect.top
-      const p = total > 0 ? Math.max(0, Math.min(1, scrolled / total)) : 0
-      sigProgressRef.current = p
-      setSigProgress(p)
-      const phase = Math.min(3, Math.floor(p * 4 - 1e-6))
-      const safePhase = phase < 0 ? 0 : phase
-      setSigPhase(prev => prev !== safePhase ? safePhase : prev)
-    }
-    const onScroll = () => { if (raf == null) raf = requestAnimationFrame(update) }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll, { passive: true })
-    update()
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-      if (raf) cancelAnimationFrame(raf)
-    }
-  }, [isMobile])
 
   /* Auto-rotate hero — paused while popping */
   useEffect(() => {
@@ -705,6 +650,9 @@ export default function HomePage() {
         transition: 'background 1s ease',
         paddingTop: 'var(--nav-h)',
       }}>
+        {/* Cycling background images — cola1 → cola2 → cola3 (crossfade every 6s) */}
+        <HeroCycleBg isMobile={isMobile} />
+
         {/* Secondary background that fades in during pin scene 3 */}
         <div ref={heroBgRef} style={{
           position: 'absolute', inset: 0,
@@ -779,18 +727,41 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="anim" style={{
-              display: 'flex', gap: '2.5rem', flexWrap: 'wrap',
-              paddingTop: '2rem', borderTop: '1px solid rgba(26,26,46,.1)',
+              display: 'inline-flex',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              padding: 'clamp(.9rem, 1.6vw, 1.2rem) clamp(1.1rem, 2vw, 1.6rem)',
+              marginTop: '2rem',
+              background: 'rgba(255,255,255,.82)',
+              WebkitBackdropFilter: 'blur(18px) saturate(1.4)',
+              backdropFilter:        'blur(18px) saturate(1.4)',
+              borderRadius: 20,
+              border: '1px solid rgba(255,255,255,.6)',
+              boxShadow: '0 14px 40px rgba(26,26,46,.12), 0 2px 8px rgba(26,26,46,.04)',
             }}>
-              {[['12','Bold Flavors'],['4','Video Stories'],['1','Iconic Heritage']].map(([n,l]) => (
-                <div key={l}>
+              {[['12','Bold Flavors'],['4','Video Stories'],['1','Iconic Heritage']].map(([n,l], i, arr) => (
+                <div key={l} style={{
+                  display: 'flex', alignItems: 'center', gap: '.7rem',
+                  paddingRight: i < arr.length - 1 ? 'clamp(1rem, 2vw, 1.6rem)' : 0,
+                  borderRight: i < arr.length - 1 ? '1px solid rgba(26,26,46,.1)' : 'none',
+                }}>
                   <div style={{
-                    fontFamily: "'Sora',sans-serif", fontSize: '2rem', fontWeight: 800,
-                    background: `linear-gradient(135deg, ${featured.color}, #f77f00)`,
-                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-                    transition: 'background 1s',
+                    fontFamily: "'Sora',sans-serif",
+                    fontSize: 'clamp(1.6rem, 2.6vw, 2rem)',
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    color: featured.color,
+                    transition: 'color 1s',
+                    letterSpacing: '-0.02em',
                   }}>{n}</div>
-                  <div style={{ fontSize: '.77rem', color: '#6b7280', fontWeight: 500, marginTop: 2, letterSpacing: '.04em' }}>{l}</div>
+                  <div style={{
+                    fontSize: '.74rem',
+                    color: '#374151',
+                    fontWeight: 700,
+                    letterSpacing: '.06em',
+                    textTransform: 'uppercase',
+                    lineHeight: 1.2,
+                  }}>{l}</div>
                 </div>
               ))}
             </div>
@@ -830,181 +801,6 @@ export default function HomePage() {
           style={{ position: 'absolute', bottom: -1, left: 0, width: '100%', height: 80, fill: '#fff', pointerEvents: 'none' }}>
           <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" />
         </svg>
-      </section>
-
-      {/* ═══════════════════════════════════════ SIGNATURE 3D BOTTLE — Splash Diorama (sticky pin) ════ */}
-      <section
-        ref={signatureRef}
-        style={{
-          position: 'relative',
-          height: isMobile ? 'auto' : '250vh',  /* 1 viewport visible + 150% scroll-through */
-          background: `linear-gradient(180deg, #fff 0%, ${featured.light} 50%, #fff5e8 100%)`,
-          transition: 'background 1s ease',
-        }}
-      >
-        <div
-          className="diorama-sticky"
-          style={{
-            position: isMobile ? 'relative' : 'sticky',
-            top: 0,
-            height: isMobile ? 'auto' : '100vh',
-            width: '100%',
-            overflow: 'hidden',
-            display: 'flex', alignItems: 'center',
-            padding: isMobile ? '4rem 0 3rem' : 0,
-          }}
-        >
-          {/* Ambient blobs */}
-          <div style={{
-            position: 'absolute', width: 500, height: 500,
-            top: '-15%', left: '-8%', borderRadius: '50%',
-            background: `radial-gradient(circle, ${featured.glow}, transparent 70%)`,
-            filter: 'blur(70px)', pointerEvents: 'none', zIndex: 0,
-            transition: 'background 1s',
-          }} />
-          <div style={{
-            position: 'absolute', width: 380, height: 380,
-            bottom: '-10%', right: '-5%', borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(155,93,229,.22), transparent 70%)',
-            filter: 'blur(70px)', pointerEvents: 'none', zIndex: 0,
-          }} />
-
-          {/* 3D Diorama Canvas — fills right half on desktop, full on mobile */}
-          <div
-            className="diorama-canvas"
-            style={{
-              position: isMobile ? 'relative' : 'absolute',
-              right: 0, top: 0, bottom: 0,
-              width: isMobile ? '100%' : '55%',
-              height: isMobile ? 'clamp(360px, 56vh, 500px)' : '100%',
-              order: isMobile ? -1 : 0,
-            }}
-          >
-            {/* Glow halo behind bottle */}
-            <div style={{
-              position: 'absolute', inset: '10%',
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${featured.glow}, transparent 65%)`,
-              filter: 'blur(50px)', opacity: 0.85,
-              pointerEvents: 'none', zIndex: 0,
-              transition: 'background 1s',
-            }} />
-            <LazySuspense fallback={
-              <div style={{
-                position: 'absolute', inset: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#9ca3af', fontSize: '.85rem',
-              }}>Loading splash…</div>
-            }>
-              <SodaBottleScene
-                accent={featured.color}
-                flavorName={featured.name}
-                progressRef={sigProgressRef}
-                isMobile={isMobile}
-              />
-            </LazySuspense>
-          </div>
-
-          {/* Left — phase-based text overlay */}
-          <div
-            className="container diorama-text-wrap"
-            style={{
-              position: 'relative', zIndex: 2,
-              width: '100%',
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-              alignItems: 'center',
-              minHeight: isMobile ? 'auto' : '100vh',
-            }}
-          >
-            <div className="diorama-text" style={{
-              paddingRight: isMobile ? 0 : '2rem',
-              textAlign: isMobile ? 'center' : 'left',
-            }}>
-              {isMobile ? (
-                /* Mobile: single static block */
-                <DioramaTextBlock
-                  phase={SIG_PHASES[0]}
-                  accent={featured.color}
-                  onCta={() => playClick()}
-                />
-              ) : (
-                /* Desktop: phase-switching with AnimatePresence */
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={sigPhase}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -30 }}
-                    transition={{ duration: 0.55, ease: [0.2, 0.7, 0.3, 1] }}
-                  >
-                    <DioramaTextBlock
-                      phase={SIG_PHASES[sigPhase]}
-                      accent={featured.color}
-                      onCta={() => playClick()}
-                    />
-                  </motion.div>
-                </AnimatePresence>
-              )}
-
-              {/* Phase progress dots — desktop only */}
-              {!isMobile && (
-                <div style={{
-                  display: 'flex', gap: '.5rem',
-                  marginTop: '2.5rem',
-                  alignItems: 'center',
-                }}>
-                  {SIG_PHASES.map((_, i) => (
-                    <div key={i} style={{
-                      width: i === sigPhase ? 36 : 10,
-                      height: 4,
-                      borderRadius: 9999,
-                      background: i <= sigPhase ? featured.color : 'rgba(26,26,46,.14)',
-                      transition: 'width .45s, background .55s',
-                    }} />
-                  ))}
-                  <span style={{
-                    marginLeft: '.7rem',
-                    fontFamily: "'Sora',sans-serif",
-                    fontSize: '.7rem', fontWeight: 700,
-                    letterSpacing: '.16em', textTransform: 'uppercase',
-                    color: featured.color,
-                    transition: 'color 1s',
-                  }}>
-                    {Math.round(sigProgress * 100)}% · Step {sigPhase + 1}/4
-                  </span>
-                </div>
-              )}
-            </div>
-            {/* Right column empty on desktop — canvas occupies it absolutely */}
-            <div />
-          </div>
-
-          {/* Scroll hint (only when at top of section, desktop) */}
-          {!isMobile && sigProgress < 0.05 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1, y: [0, 5, 0] }}
-              transition={{ opacity: { duration: 0.6 }, y: { duration: 1.6, repeat: Infinity } }}
-              style={{
-                position: 'absolute', bottom: '2rem', left: '50%',
-                transform: 'translateX(-50%)',
-                fontFamily: "'Sora',sans-serif",
-                fontSize: '.72rem', fontWeight: 700,
-                letterSpacing: '.18em', textTransform: 'uppercase',
-                color: '#9ca3af', zIndex: 3,
-              }}
-            >
-              ↓ Scroll to explore
-            </motion.div>
-          )}
-        </div>
-
-        <style>{`
-          @media(max-width: 900px) {
-            .diorama-text-wrap { grid-template-columns: 1fr !important; }
-          }
-        `}</style>
       </section>
 
       {/* ═══════════════════════════════════════ MARQUEE STRIP ════ */}
@@ -1053,10 +849,10 @@ export default function HomePage() {
               viewport={{ once:true, margin:'-80px' }} transition={{ duration:.9 }}
               style={{ position: 'relative' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <TiltImage src="/images/lifestyle1.jpeg" mt={0} />
-                <TiltImage src="/images/lifestyle2.jpeg" mt="2.5rem" />
-                <TiltImage src="/images/lifestyle3.jpeg" mt={0} />
-                <TiltImage src="/images/lifestyle4.jpeg" mt="-2rem" />
+                <TiltImage src="/images/whatisIndicola/1.png" mt={0} />
+                <TiltImage src="/images/whatisIndicola/2.png" mt="2.5rem" />
+                <TiltImage src="/images/whatisIndicola/3.png" mt={0} />
+                <TiltImage src="/images/whatisIndicola/4.png" mt="-2rem" />
               </div>
               <div style={{
                 position:'absolute', bottom:-20, right:-20,
