@@ -37,14 +37,19 @@ function Bubbles({ count = 18 }) {
   )
 }
 
-function TiltImage({ src, mt = 0 }) {
-  const tiltRef = useTilt({ intensity: 9, scale: 1.03 })
+function TiltImage({ src, mt = 0, naked = false }) {
+  const tiltRef = useTilt({ intensity: 9, scale: 1.05 })
   const scrollRef = useScrollTilt({ amount: 7, axis: 'x', invert: true })
   return (
     <div ref={scrollRef} style={{ marginTop: mt, perspective: 1000 }}>
       <div ref={tiltRef} style={{ transformStyle: 'preserve-3d' }}>
         <img src={src} alt="" loading="lazy"
-          style={{
+          style={naked ? {
+            width: '100%', height: 'auto',
+            objectFit: 'contain',
+            display: 'block',
+            filter: 'drop-shadow(0 18px 28px rgba(230,57,70,.25)) drop-shadow(0 4px 10px rgba(26,26,46,.12))',
+          } : {
             width:'100%', borderRadius:20, objectFit:'cover',
             aspectRatio:'1',
             boxShadow:'0 18px 48px rgba(26,26,46,.18), 0 4px 16px rgba(26,26,46,.08)',
@@ -55,27 +60,34 @@ function TiltImage({ src, mt = 0 }) {
 }
 
 /* ─────────── BACKGROUND VIDEOS — seamless crossfade between two slots ─────────── */
-/* ─────────── HERO CYCLING IMAGES — crossfades through cola1/2/3 ─────────── */
-const HERO_IMAGES = [
+/* ─────────── HERO CYCLING IMAGES — desktop + mobile-specific sets ─────────── */
+const HERO_IMAGES_DESKTOP = [
   '/images/homepagephoto/cola1.png',
   '/images/homepagephoto/cola2.png',
   '/images/homepagephoto/cola3.png',
 ]
+const HERO_IMAGES_MOBILE = [
+  '/images/homepagephoto/mobileview/heroMobile1.jpeg',
+  '/images/homepagephoto/mobileview/heromobileview2.jpeg',
+  '/images/homepagephoto/mobileview/heromobileview3.jpeg',
+]
 
 function HeroCycleBg({ isMobile }) {
+  const images = isMobile ? HERO_IMAGES_MOBILE : HERO_IMAGES_DESKTOP
   const [active, setActive] = useState(0)
   useEffect(() => {
-    /* Preload all three so swaps are instant */
-    HERO_IMAGES.forEach(src => { const i = new Image(); i.src = src })
+    /* Preload all so swaps are instant */
+    images.forEach(src => { const i = new Image(); i.src = src })
+    setActive(0)
     const id = setInterval(() => {
-      setActive(a => (a + 1) % HERO_IMAGES.length)
+      setActive(a => (a + 1) % images.length)
     }, 6000)
     return () => clearInterval(id)
-  }, [])
+  }, [isMobile])
 
   return (
     <>
-      {HERO_IMAGES.map((src, i) => (
+      {images.map((src, i) => (
         <div key={src} style={{
           position: 'absolute', inset: 0, zIndex: 0,
           backgroundImage: `url(${src})`,
@@ -101,7 +113,7 @@ function HeroCycleBg({ isMobile }) {
         right: 'clamp(1.5rem,3vw,2.5rem)',
         zIndex: 5, display: 'flex', gap: '.5rem',
       }}>
-        {HERO_IMAGES.map((_, i) => (
+        {images.map((_, i) => (
           <button
             key={i}
             onClick={() => setActive(i)}
@@ -849,10 +861,10 @@ export default function HomePage() {
               viewport={{ once:true, margin:'-80px' }} transition={{ duration:.9 }}
               style={{ position: 'relative' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <TiltImage src="/images/whatisIndicola/1.png" mt={0} />
-                <TiltImage src="/images/whatisIndicola/2.png" mt="2.5rem" />
-                <TiltImage src="/images/whatisIndicola/3.png" mt={0} />
-                <TiltImage src="/images/whatisIndicola/4.png" mt="-2rem" />
+                <TiltImage src="/images/whatisIndicola/1.png" mt={0} naked />
+                <TiltImage src="/images/whatisIndicola/2.png" mt="2.5rem" naked />
+                <TiltImage src="/images/whatisIndicola/3.png" mt={0} naked />
+                <TiltImage src="/images/whatisIndicola/4.png" mt="-2rem" naked />
               </div>
               <div style={{
                 position:'absolute', bottom:-20, right:-20,

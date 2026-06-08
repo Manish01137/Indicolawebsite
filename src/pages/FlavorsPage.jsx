@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
@@ -7,19 +7,133 @@ import { useScrollTilt } from '../hooks/useScrollTilt'
 import VideoLightbox from '../components/VideoLightbox'
 import { PlayIcon, ArrowIcon } from '../components/SocialIcons'
 
+/* ─────────── PREMIUM FLAVORS BANNER — crossfades through all 14 splash images ─────────── */
+const BANNER_IMAGES = [
+  '/images/flaoverpage/cherrryCola.png',
+  '/images/flaoverpage/cocoberry.png',
+  '/images/flaoverpage/gingerlime.png',
+  '/images/flaoverpage/cottonCanday.png',
+  '/images/flaoverpage/berrymagma.png',
+  '/images/flaoverpage/pinachicola.png',
+  '/images/flaoverpage/AmericanIcecream.png',
+  '/images/flaoverpage/fruitbeer.png',
+  '/images/flaoverpage/Berrypunch.png',
+  '/images/flaoverpage/citrusBlast.png',
+  '/images/flaoverpage/strawberry.png',
+  '/images/flaoverpage/peachpunch.png',
+]
+
+function FlavorsBanner({ isMobile }) {
+  const [active, setActive] = useState(0)
+  useEffect(() => {
+    /* Preload the next image so swap is instant */
+    const next = (active + 1) % BANNER_IMAGES.length
+    const img = new Image()
+    img.src = BANNER_IMAGES[next]
+  }, [active])
+  useEffect(() => {
+    const id = setInterval(() => setActive(a => (a + 1) % BANNER_IMAGES.length), 4500)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <section style={{
+      position: 'relative', width: '100%',
+      height: isMobile ? '42vh' : '64vh',
+      minHeight: isMobile ? 320 : 420,
+      overflow: 'hidden',
+      background: '#0d0d18',
+    }}>
+      {/* Image layers crossfading */}
+      {BANNER_IMAGES.map((src, i) => (
+        <div key={src} style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${src})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: i === active ? 1 : 0,
+          transform: i === active ? 'scale(1)' : 'scale(1.08)',
+          transition: 'opacity 1.4s ease, transform 6s ease-out',
+          willChange: 'opacity, transform',
+        }} />
+      ))}
+
+      {/* Soft cinematic vignette */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'linear-gradient(180deg, rgba(0,0,0,.25) 0%, transparent 30%, transparent 60%, rgba(0,0,0,.5) 100%)',
+      }} />
+
+      {/* Bottom overlay with text */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0,
+        padding: 'clamp(1.5rem, 3vw, 2.5rem) clamp(1.25rem, 4vw, 3rem)',
+        color: '#fff',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+        gap: '1rem', flexWrap: 'wrap',
+      }}>
+        <div>
+          <span style={{
+            display: 'inline-block',
+            fontFamily: "'Sora',sans-serif",
+            fontSize: '.72rem', fontWeight: 700,
+            letterSpacing: '.18em', textTransform: 'uppercase',
+            color: '#fff',
+            background: 'rgba(230,57,70,.92)',
+            padding: '.35rem .9rem',
+            borderRadius: 9999,
+            marginBottom: '.8rem',
+            boxShadow: '0 6px 18px rgba(230,57,70,.45)',
+          }}>
+            12 Bold Flavors
+          </span>
+          <h2 style={{
+            fontFamily: "'Sora',sans-serif",
+            fontSize: 'clamp(1.8rem, 4.5vw, 3rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.025em',
+            margin: 0,
+            color: '#fff',
+            textShadow: '0 4px 18px rgba(0,0,0,.5)',
+            maxWidth: 700,
+            lineHeight: 1.1,
+          }}>
+            Crafted in motion. Captured in colour.
+          </h2>
+        </div>
+
+        {/* Indicator dots */}
+        <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }}>
+          {BANNER_IMAGES.map((_, i) => (
+            <button key={i} onClick={() => setActive(i)}
+              aria-label={`Show banner ${i+1}`}
+              style={{
+                width: i === active ? 28 : 8, height: 8, borderRadius: 9999,
+                background: i === active ? '#fff' : 'rgba(255,255,255,.45)',
+                border: 'none', cursor: 'pointer', padding: 0,
+                transition: 'width .4s, background .4s',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 const ALL_FLAVORS = [
-  { name: 'Cherry Cola',          img: '/images/cherry-cola.png',          color: '#e63946', bg: '#ffe4e6', tag: 'Classic',  video: '/videos/cherrycola.mp4',   desc: 'Classic cola meets cherry — bold & unforgettable' },
-  { name: 'Coco Berry',           img: '/images/coco-berry.png',           color: '#ff70a6', bg: '#fce7f3', tag: 'Exotic',   video: '/videos/cocaberry.mp4',    desc: 'Coconut meets berry — pure tropical magic' },
-  { name: 'Ginger Lime',          img: '/images/ginger-lime.png',          color: '#06d6a0', bg: '#d1fae5', tag: 'Fresh',    video: '/videos/gingerlime.mp4',   desc: 'Bold zing & cool freshness — premium & clean' },
-  { name: 'Cotton Candy',         img: '/images/cotton-candy.png',         color: '#9b5de5', bg: '#f3e8ff', tag: 'Sweet',    video: '/videos/cottoncanday.mp4', desc: 'Sweet carnival in every sip — playful & fun' },
-  { name: 'Berry Magma',          img: '/images/berry-magma.png',          color: '#7c3aed', bg: '#ede9fe', tag: 'Fan Favorite', desc: 'Wild berry explosion in every bottle' },
-  { name: 'Pinachi',              img: '/images/pinachi.png',              color: '#f77f00', bg: '#fff3e0', tag: 'Tropical', desc: 'Tropical pineapple — fiery & sweet' },
-  { name: 'Americano Ice Cream',  img: '/images/americano-icecream.png',   color: '#ffd166', bg: '#fffde7', tag: 'Sweet',    desc: 'Sweet cream soda dream' },
-  { name: 'Fruitbeer With Malt',  img: '/images/peach-punch.png',          color: '#e9c46a', bg: '#fdf6e3', tag: 'Unique',   desc: 'Fruity malt euphoria' },
-  { name: 'Green Twister',        img: '/images/green-twister.png',        color: '#06d6a0', bg: '#d1fae5', tag: 'Refreshing', desc: 'Cool green rush' },
-  { name: 'Citrus Blast',         img: '/images/citrus-blast.png',         color: '#f4a261', bg: '#fff3e0', tag: 'Zesty',    desc: 'Zesty citrus explosion' },
-  { name: 'Strawberry Margarita', img: '/images/strawberry.png',           color: '#ff4d6d', bg: '#ffe4e6', tag: 'Bold',     desc: 'Fiesta in every bubble' },
-  { name: 'Peach Punch',          img: '/images/peach-punch.png',          color: '#ffb347', bg: '#fff8e1', tag: 'Summer',   desc: 'Peachy summer punch' },
+  { name: 'Cherry Cola',          img: '/images/flaoverpage/cherrryCola.png',     color: '#e63946', bg: '#ffe4e6', tag: 'Classic',  video: '/videos/cherrycola.mp4',   desc: 'Classic cola meets cherry — bold & unforgettable' },
+  { name: 'Coco Berry',           img: '/images/flaoverpage/cocoberry.png',       color: '#ff70a6', bg: '#fce7f3', tag: 'Exotic',   video: '/videos/cocaberry.mp4',    desc: 'Coconut meets berry — pure tropical magic' },
+  { name: 'Ginger Lime',          img: '/images/flaoverpage/gingerlime.png',      color: '#06d6a0', bg: '#d1fae5', tag: 'Fresh',    video: '/videos/gingerlime.mp4',   desc: 'Bold zing & cool freshness — premium & clean' },
+  { name: 'Cotton Candy',         img: '/images/flaoverpage/cottonCanday.png',    color: '#9b5de5', bg: '#f3e8ff', tag: 'Sweet',    video: '/videos/cottoncanday.mp4', desc: 'Sweet carnival in every sip — playful & fun' },
+  { name: 'Berry Magma',          img: '/images/flaoverpage/berrymagma.png',      color: '#7c3aed', bg: '#ede9fe', tag: 'Fan Favorite', desc: 'Wild berry explosion in every bottle' },
+  { name: 'Pinachi',              img: '/images/flaoverpage/pinachicola.png',     color: '#f77f00', bg: '#fff3e0', tag: 'Tropical', desc: 'Tropical pineapple — fiery & sweet' },
+  { name: 'Americano Ice Cream',  img: '/images/flaoverpage/AmericanIcecream.png',color: '#ffd166', bg: '#fffde7', tag: 'Sweet',    desc: 'Sweet cream soda dream' },
+  { name: 'Fruitbeer With Malt',  img: '/images/flaoverpage/fruitbeer.png',       color: '#e9c46a', bg: '#fdf6e3', tag: 'Unique',   desc: 'Fruity malt euphoria' },
+  { name: 'Berry Punch',          img: '/images/flaoverpage/Berrypunch.png',      color: '#06d6a0', bg: '#d1fae5', tag: 'Refreshing', desc: 'Wild berries with a fizzy punch' },
+  { name: 'Citrus Blast',         img: '/images/flaoverpage/citrusBlast.png',     color: '#f4a261', bg: '#fff3e0', tag: 'Zesty',    desc: 'Zesty citrus explosion' },
+  { name: 'Strawberry Margarita', img: '/images/flaoverpage/strawberry.png',      color: '#ff4d6d', bg: '#ffe4e6', tag: 'Bold',     desc: 'Fiesta in every bubble' },
+  { name: 'Peach Punch',          img: '/images/flaoverpage/peachpunch.png',      color: '#ffb347', bg: '#fff8e1', tag: 'Summer',   desc: 'Peachy summer punch' },
 ]
 
 const TAGS = ['All', 'With Video', 'Fan Favorite', 'Classic', 'Tropical', 'Sweet', 'Refreshing', 'Zesty', 'Bold', 'Fresh', 'Exotic', 'Unique', 'Summer']
@@ -232,6 +346,9 @@ export default function FlavorsPage() {
           <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" />
         </svg>
       </section>
+
+      {/* Premium banner — crossfades through all flavor splash images */}
+      <FlavorsBanner isMobile={isMobile} />
 
       {/* Filter + grid */}
       <section style={{ background: '#fffdf5', padding: '4rem 0 6rem' }}>

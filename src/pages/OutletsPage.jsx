@@ -29,6 +29,14 @@ const OUTLETS = [
   { name: 'Desi Mart Indo-Pak Groceries',        type: 'Grocery',      url: 'https://share.google/BR9BXZxnn9773mQ0W' },
   { name: 'Country Market',                      type: 'Grocery',      url: 'https://share.google/uE3aVN9spW1xWjAtY' },
   { name: 'Twin City Mart Liquor',               type: 'Liquor Store', url: 'https://share.google/7sbzfpnY17YCzxgTg' },
+  /* ─── New outlets ─── */
+  { name: 'Tejas Grocery',                       type: 'Grocery',      url: 'https://krispykrunchy.com/locations/tejas-grocery-5' },
+  { name: 'Tejas — Silsbee (Map)',               type: 'Convenience',  url: 'https://maps.google.com/?q=30.370022,-94.311913' },
+  { name: 'Tejas — Exxon Silsbee',               type: 'Gas Station',  url: 'https://www.exxon.com/en/find-station/exxon-silsbee-tx-tejas5-200311344' },
+  { name: 'Sunshine Grocery — Bon Wier',         type: 'Grocery',      url: 'https://maps.google.com/?q=30.740007,-93.644882' },
+  { name: 'Sunshine Stores Group',               type: 'Grocery',      url: 'https://sunshinestoresgroup.com/' },
+  { name: 'Quickway',                            type: 'Convenience',  url: 'https://maps.google.com/?q=30.776333,-94.406616' },
+  { name: 'Cotton Tops',                         type: 'Convenience',  url: 'https://sunshinestoresgroup.com/' },
 ]
 
 const TYPE_META = {
