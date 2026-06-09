@@ -6,6 +6,7 @@ import { useTilt, useOnScreen, useDevice } from '../hooks/useTilt'
 import { useScrollTilt } from '../hooks/useScrollTilt'
 import VideoLightbox from '../components/VideoLightbox'
 import { PlayIcon, ArrowIcon } from '../components/SocialIcons'
+import { FLAVORS as ALL_FLAVORS } from '../data/flavors'
 
 /* ─────────── PREMIUM FLAVORS BANNER — crossfades through all 14 splash images ─────────── */
 const BANNER_IMAGES = [
@@ -121,20 +122,6 @@ function FlavorsBanner({ isMobile }) {
   )
 }
 
-const ALL_FLAVORS = [
-  { name: 'Cherry Cola',          img: '/images/flaoverpage/cherrryCola.png',     color: '#e63946', bg: '#ffe4e6', tag: 'Classic',  video: '/videos/cherrycola.mp4',   desc: 'Classic cola meets cherry — bold & unforgettable' },
-  { name: 'Coco Berry',           img: '/images/flaoverpage/cocoberry.png',       color: '#ff70a6', bg: '#fce7f3', tag: 'Exotic',   video: '/videos/cocaberry.mp4',    desc: 'Coconut meets berry — pure tropical magic' },
-  { name: 'Ginger Lime',          img: '/images/flaoverpage/gingerlime.png',      color: '#06d6a0', bg: '#d1fae5', tag: 'Fresh',    video: '/videos/gingerlime.mp4',   desc: 'Bold zing & cool freshness — premium & clean' },
-  { name: 'Cotton Candy',         img: '/images/flaoverpage/cottonCanday.png',    color: '#9b5de5', bg: '#f3e8ff', tag: 'Sweet',    video: '/videos/cottoncanday.mp4', desc: 'Sweet carnival in every sip — playful & fun' },
-  { name: 'Berry Magma',          img: '/images/flaoverpage/berrymagma.png',      color: '#7c3aed', bg: '#ede9fe', tag: 'Fan Favorite', desc: 'Wild berry explosion in every bottle' },
-  { name: 'Pinachi',              img: '/images/flaoverpage/pinachicola.png',     color: '#f77f00', bg: '#fff3e0', tag: 'Tropical', desc: 'Tropical pineapple — fiery & sweet' },
-  { name: 'Americano Ice Cream',  img: '/images/flaoverpage/AmericanIcecream.png',color: '#ffd166', bg: '#fffde7', tag: 'Sweet',    desc: 'Sweet cream soda dream' },
-  { name: 'Fruitbeer With Malt',  img: '/images/flaoverpage/fruitbeer.png',       color: '#e9c46a', bg: '#fdf6e3', tag: 'Unique',   desc: 'Fruity malt euphoria' },
-  { name: 'Berry Punch',          img: '/images/flaoverpage/Berrypunch.png',      color: '#06d6a0', bg: '#d1fae5', tag: 'Refreshing', desc: 'Wild berries with a fizzy punch' },
-  { name: 'Citrus Blast',         img: '/images/flaoverpage/citrusBlast.png',     color: '#f4a261', bg: '#fff3e0', tag: 'Zesty',    desc: 'Zesty citrus explosion' },
-  { name: 'Strawberry Margarita', img: '/images/flaoverpage/strawberry.png',      color: '#ff4d6d', bg: '#ffe4e6', tag: 'Bold',     desc: 'Fiesta in every bubble' },
-  { name: 'Peach Punch',          img: '/images/flaoverpage/peachpunch.png',      color: '#ffb347', bg: '#fff8e1', tag: 'Summer',   desc: 'Peachy summer punch' },
-]
 
 const TAGS = ['All', 'Fan Favorite', 'Classic', 'Tropical', 'Sweet', 'Refreshing', 'Zesty', 'Bold', 'Fresh', 'Exotic', 'Unique', 'Summer']
 
@@ -270,7 +257,13 @@ function StaticFlavorCard({ f, isMobile, index = 0 }) {
   const tiltRef = useTilt({ intensity: 14, scale: 1.03 })
   const scrollRef = useScrollTilt({ amount: 5, axis: 'x', invert: index % 2 === 0 })
   return (
-    <div style={{ perspective: 1100, height: '100%' }}>
+    <Link
+      to={`/flavor/${f.slug}`}
+      style={{
+        display: 'block', textDecoration: 'none', color: 'inherit',
+        perspective: 1100, height: '100%', cursor: 'pointer',
+      }}
+    >
       <div ref={scrollRef} style={{ height: '100%' }}>
       <div
         ref={isMobile ? null : tiltRef}
@@ -294,6 +287,7 @@ function StaticFlavorCard({ f, isMobile, index = 0 }) {
             left: '15%', top: '15%',
             borderRadius: '50%',
             background: `radial-gradient(circle,${f.color}28,transparent)`, filter: 'blur(22px)',
+            pointerEvents: 'none',
           }} />
           <img
             src={f.img} alt={f.name} loading="lazy"
@@ -302,6 +296,7 @@ function StaticFlavorCard({ f, isMobile, index = 0 }) {
               width: '100%', height: '100%',
               objectFit: 'cover', objectPosition: 'center',
               display: 'block', zIndex: 1,
+              pointerEvents: 'none',
             }}
           />
         </div>
@@ -312,17 +307,17 @@ function StaticFlavorCard({ f, isMobile, index = 0 }) {
             <span className="tag" style={{ background: f.color, color: '#fff' }}>{f.tag}</span>
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: f.color, boxShadow: `0 0 8px ${f.color}` }} />
           </div>
-          <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: '1.1rem', fontWeight: 700, marginBottom: '.4rem' }}>{f.name}</h3>
+          <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: '1.1rem', fontWeight: 700, marginBottom: '.4rem', color: '#1a1a2e' }}>{f.name}</h3>
           <p style={{ fontSize: '.85rem', color: '#6b7280', marginBottom: '.85rem', lineHeight: 1.55, flex: 1 }}>{f.desc}</p>
-          <Link to="/contact"
+          <span
             style={{ fontSize: '.85rem', fontWeight: 700, color: f.color, fontFamily: "'Sora',sans-serif", display:'inline-flex', alignItems:'center', gap:'.35rem', marginTop: 'auto' }}
           >
-            Contact Us <ArrowIcon size={13} />
-          </Link>
+            Discover <ArrowIcon size={13} />
+          </span>
         </div>
       </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
