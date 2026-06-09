@@ -217,22 +217,25 @@ export default function AboutPage() {
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'5rem', alignItems:'center' }}>
             <motion.div initial={{ opacity:0, x:-50 }} whileInView={{ opacity:1, x:0 }}
               viewport={{ once:true, margin:'-80px' }} transition={{ duration:.9 }}>
-              <span className="label">Our Story</span>
+              <span className="label">Our Process</span>
               <h2 style={{ fontSize:'clamp(2rem,4vw,3rem)', marginBottom:'1.2rem' }}>
-                Enjoy <span className="grad">IndiColas Soda</span><br />Many Flavors
+                Experience Soda<br /><span className="grad">Like Never Before</span>
               </h2>
               <p style={{ color:'#6b7280', lineHeight:1.8, marginBottom:'1.2rem' }}>
-                IndiColas is the newest sensation shaking up America's beverage scene — blending cherished soda traditions with contemporary taste and delivering consistency and excellence in every sip.
+                Indicola is bringing a fresh twist to America's soda scene with bold flavors, premium ingredients, and an unforgettable drinking experience.
+              </p>
+              <p style={{ color:'#6b7280', lineHeight:1.8, marginBottom:'1.2rem' }}>
+                Built around the iconic Codd Neck Bottle, every sip combines playful nostalgia with modern refreshment — creating a beverage that's as fun to open as it is to enjoy.
               </p>
               <p style={{ color:'#6b7280', lineHeight:1.8, marginBottom:'2rem' }}>
-                Inspired by the iconic Codd-neck Goli Soda bottle that defined Indian summers, railway platforms, and street corners for generations, we've modernized the experience without losing its soul.
+                From tropical favorites to candy-inspired creations, our growing collection of flavors is crafted for adventurous taste buds looking for something beyond ordinary soda.
               </p>
 
               {/* Mission / Vision */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1.2rem', marginBottom:'2rem' }}>
                 {[
-                  { t:'Our Mission', c:'#e63946', bg:'#ffe4e6', d:'To craft refreshing, high-quality beverages that combine nostalgia with contemporary taste, delivering consistency and excellence.' },
-                  { t:'Our Vision',  c:'#9b5de5', bg:'#f3e8ff', d:'Building a globally recognized beverage brand blending traditional flavors with modern innovation while prioritizing quality and sustainability.' },
+                  { t:'Our Mission', c:'#e63946', bg:'#ffe4e6', d:'To create exciting, high-quality beverages that turn everyday moments into memorable experiences through bold flavors, innovation, and refreshment.' },
+                  { t:'Our Vision',  c:'#9b5de5', bg:'#f3e8ff', d:"To become America's most recognizable Codd Neck Bottle beverage brand, delivering unique flavors and unforgettable experiences to soda lovers everywhere." },
                 ].map(({ t, c, bg, d }) => (
                   <div key={t} style={{ background: bg, borderRadius: 16, padding: '1.2rem' }}>
                     <h4 style={{ fontFamily:"'Sora',sans-serif", color: c, fontWeight: 700, fontSize: '.9rem', marginBottom: '.5rem' }}>{t}</h4>

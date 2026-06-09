@@ -726,9 +726,9 @@ export default function HomePage() {
               lineHeight: 1.75, maxWidth: 460, marginBottom: '2.2rem',
               textShadow: '0 1px 12px rgba(255,253,245,.9)',
             }}>
-              Heritage-inspired sodas with a bold modern twist — bringing India's iconic Goli Soda culture to the USA in 12 vibrant flavors.
+              Experience the iconic Codd Neck Bottle — reimagined for today's flavor lovers.
             </p>
-            <div className="anim" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '3rem' }}>
+            <div className="anim" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
               <Link to="/flavors" style={{ textDecoration: 'none' }} onClick={() => playClick()}>
                 <MagneticButton className="btn btn-primary" style={{ fontSize: '1.02rem', padding: '1rem 2.2rem' }}>
                   Explore Flavors →
@@ -738,56 +738,8 @@ export default function HomePage() {
                 Our Story
               </Link>
             </div>
-            <div className="anim" style={{
-              display: 'inline-flex',
-              flexWrap: 'wrap',
-              gap: '1rem',
-              padding: 'clamp(.9rem, 1.6vw, 1.2rem) clamp(1.1rem, 2vw, 1.6rem)',
-              marginTop: '2rem',
-              background: 'rgba(255,255,255,.82)',
-              WebkitBackdropFilter: 'blur(18px) saturate(1.4)',
-              backdropFilter:        'blur(18px) saturate(1.4)',
-              borderRadius: 20,
-              border: '1px solid rgba(255,255,255,.6)',
-              boxShadow: '0 14px 40px rgba(26,26,46,.12), 0 2px 8px rgba(26,26,46,.04)',
-            }}>
-              {[['12','Bold Flavors'],['4','Video Stories'],['1','Iconic Heritage']].map(([n,l], i, arr) => (
-                <div key={l} style={{
-                  display: 'flex', alignItems: 'center', gap: '.7rem',
-                  paddingRight: i < arr.length - 1 ? 'clamp(1rem, 2vw, 1.6rem)' : 0,
-                  borderRight: i < arr.length - 1 ? '1px solid rgba(26,26,46,.1)' : 'none',
-                }}>
-                  <div style={{
-                    fontFamily: "'Sora',sans-serif",
-                    fontSize: 'clamp(1.6rem, 2.6vw, 2rem)',
-                    fontWeight: 800,
-                    lineHeight: 1,
-                    color: featured.color,
-                    transition: 'color 1s',
-                    letterSpacing: '-0.02em',
-                  }}>{n}</div>
-                  <div style={{
-                    fontSize: '.74rem',
-                    color: '#374151',
-                    fontWeight: 700,
-                    letterSpacing: '.06em',
-                    textTransform: 'uppercase',
-                    lineHeight: 1.2,
-                  }}>{l}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
-
-        {/* Now Playing pill — bottom-right glass card */}
-        {!isMobile && (
-          <NowPlayingPill
-            activeIdx={activeHero}
-            setActiveIdx={setActiveHero}
-            onOpenLightbox={(v) => setLightbox(v)}
-          />
-        )}
 
         {/* Continue text (appears during scene 3 of pin) */}
         <div ref={continueRef} style={{
@@ -817,7 +769,7 @@ export default function HomePage() {
 
       {/* ═══════════════════════════════════════ MARQUEE STRIP ════ */}
       <MarqueeStrip
-        items={['POP THE FIZZ', 'BOLD DESI FLAVORS', 'BORN FROM BANTA', '12 VIBRANT FLAVORS', 'CRAFTED FOR THE BOLD']}
+        items={['POP THE FIZZ', 'BOLD GLOBAL FLAVORS', 'BORN FROM BANTA', 'FIZZ WITH HISTORY', 'CRAFTED FOR THE BOLD']}
         speed={32}
         color="#e63946"
         textColor="#fff"
@@ -855,26 +807,16 @@ export default function HomePage() {
       <section style={{ background: '#fff', padding: '6rem 0' }}>
         <div className="container">
           <div className="lifestyle-grid" style={{
-            display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'center',
+            display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: '4rem', alignItems: 'center',
           }}>
             <motion.div initial={{ opacity:0, x:-50 }} whileInView={{ opacity:1, x:0 }}
               viewport={{ once:true, margin:'-80px' }} transition={{ duration:.9 }}
               style={{ position: 'relative' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.6rem' }}>
                 <TiltImage src="/images/whatisIndicola/1.png" mt={0} naked />
-                <TiltImage src="/images/whatisIndicola/2.png" mt="2.5rem" naked />
+                <TiltImage src="/images/whatisIndicola/2.png" mt="3rem" naked />
                 <TiltImage src="/images/whatisIndicola/3.png" mt={0} naked />
-                <TiltImage src="/images/whatisIndicola/4.png" mt="-2rem" naked />
-              </div>
-              <div style={{
-                position:'absolute', bottom:-20, right:-20,
-                background:'linear-gradient(135deg,#e63946,#f77f00)', color:'#fff',
-                borderRadius:16, padding:'1rem 1.5rem',
-                boxShadow:'0 12px 36px rgba(230,57,70,.35)', fontFamily:"'Sora',sans-serif",
-                zIndex: 2,
-              }}>
-                <div style={{ fontSize:'2rem', fontWeight:800, lineHeight:1 }}>12</div>
-                <div style={{ fontSize:'.78rem', fontWeight:600 }}>Bold Flavors</div>
+                <TiltImage src="/images/whatisIndicola/4.png" mt="-2.5rem" naked />
               </div>
             </motion.div>
 
@@ -891,7 +833,7 @@ export default function HomePage() {
                 Inspired by the iconic Codd-neck Goli Soda bottle, we've reinvented the experience with premium ingredients and eco-friendly packaging.
               </p>
               <div style={{ display:'flex', gap:'1.5rem', marginBottom:'2.5rem', flexWrap: 'wrap' }}>
-                {[['Quality','Premium ingredients & craft'],['Heritage','Born from Banta culture'],['Innovation','12 bold modern flavors']].map(([t,d]) => (
+                {[['Quality','Premium ingredients & craft'],['Heritage','Bold Global Flavor'],['Innovation','12 bold modern flavors']].map(([t,d]) => (
                   <div key={t}>
                     <div style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:'.95rem', color:'#e63946', marginBottom:'.25rem' }}>{t}</div>
                     <div style={{ fontSize:'.8rem', color:'#9ca3af', maxWidth: 180 }}>{d}</div>
@@ -936,7 +878,7 @@ export default function HomePage() {
         <Bubbles count={10} />
         <div className="container" style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ display:'flex', justifyContent:'space-around', flexWrap:'wrap', gap:'2.5rem', textAlign:'center' }}>
-            {[{ n: 12, s: '+', l: 'Bold Flavors' },{ n: 100, s: '%', l: 'Premium Quality' },{ n: 4,  s: '', l: 'Video Stories' },{ n: 2,  s: '', l: 'US Locations' }].map(({ n, s, l }) => (
+            {[{ n: 12, s: '+', l: 'Unique Flavors' },{ n: 100, s: '%', l: 'Premium Quality' },{ n: 1,  s: '', l: 'Legendary Bottle Design' },{ n: 1000, s: '+', l: 'Happy Sips Served' }].map(({ n, s, l }) => (
               <div key={l}>
                 <div style={{ fontFamily:"'Sora',sans-serif", fontSize:'clamp(2.5rem,5vw,3.5rem)', fontWeight:800, lineHeight:1 }}>
                   <Counter end={n} suffix={s} />

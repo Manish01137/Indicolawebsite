@@ -136,7 +136,7 @@ const ALL_FLAVORS = [
   { name: 'Peach Punch',          img: '/images/flaoverpage/peachpunch.png',      color: '#ffb347', bg: '#fff8e1', tag: 'Summer',   desc: 'Peachy summer punch' },
 ]
 
-const TAGS = ['All', 'With Video', 'Fan Favorite', 'Classic', 'Tropical', 'Sweet', 'Refreshing', 'Zesty', 'Bold', 'Fresh', 'Exotic', 'Unique', 'Summer']
+const TAGS = ['All', 'Fan Favorite', 'Classic', 'Tropical', 'Sweet', 'Refreshing', 'Zesty', 'Bold', 'Fresh', 'Exotic', 'Unique', 'Summer']
 
 /* ─────────── Card with video preview ─────────── */
 function VideoFlavorCard({ f, onWatch, isMobile, index }) {
@@ -270,47 +270,52 @@ function StaticFlavorCard({ f, isMobile, index = 0 }) {
   const tiltRef = useTilt({ intensity: 14, scale: 1.03 })
   const scrollRef = useScrollTilt({ amount: 5, axis: 'x', invert: index % 2 === 0 })
   return (
-    <div style={{ perspective: 1100 }}>
-      <div ref={scrollRef}>
+    <div style={{ perspective: 1100, height: '100%' }}>
+      <div ref={scrollRef} style={{ height: '100%' }}>
       <div
         ref={isMobile ? null : tiltRef}
         style={{
           background:'#fff', borderRadius:26, overflow:'hidden',
-          boxShadow:'0 8px 28px rgba(26,26,46,.09), 0 1px 4px rgba(26,26,46,.04)',
+          boxShadow: `0 12px 32px ${f.color}1a, 0 2px 8px rgba(26,26,46,.05)`,
           border: `1px solid ${f.color}1a`,
           transition: 'box-shadow .4s, transform .5s',
           transformStyle: 'preserve-3d',
+          height: '100%',
+          display: 'flex', flexDirection: 'column',
         }}
       >
+        {/* Uniform image area — all cards exactly the same height */}
         <div style={{
-          background: `linear-gradient(160deg,${f.bg},white)`,
-          padding: '2rem 2rem 1rem',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          height: 250, position: 'relative', overflow: 'hidden',
+          background: `linear-gradient(160deg,${f.bg},#fff)`,
+          height: 320, position: 'relative', overflow: 'hidden',
         }}>
           <div style={{
-            position: 'absolute', width: '60%', height: '60%', borderRadius: '50%',
-            background: `radial-gradient(circle,${f.color}28,transparent)`, filter: 'blur(20px)',
+            position: 'absolute', width: '70%', height: '70%',
+            left: '15%', top: '15%',
+            borderRadius: '50%',
+            background: `radial-gradient(circle,${f.color}28,transparent)`, filter: 'blur(22px)',
           }} />
-          <motion.img
+          <img
             src={f.img} alt={f.name} loading="lazy"
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
             style={{
-              maxHeight: '100%', maxWidth: '80%', objectFit: 'contain', position: 'relative', zIndex: 1,
-              filter: `drop-shadow(0 16px 28px ${f.color}40)`,
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: 'center',
+              display: 'block', zIndex: 1,
             }}
           />
         </div>
-        <div style={{ padding: '1.25rem 1.5rem 1.6rem' }}>
+
+        {/* Body */}
+        <div style={{ padding: '1.25rem 1.5rem 1.6rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.6rem' }}>
             <span className="tag" style={{ background: f.color, color: '#fff' }}>{f.tag}</span>
             <div style={{ width: 10, height: 10, borderRadius: '50%', background: f.color, boxShadow: `0 0 8px ${f.color}` }} />
           </div>
           <h3 style={{ fontFamily: "'Sora',sans-serif", fontSize: '1.1rem', fontWeight: 700, marginBottom: '.4rem' }}>{f.name}</h3>
-          <p style={{ fontSize: '.85rem', color: '#6b7280', marginBottom: '.85rem', lineHeight: 1.55 }}>{f.desc}</p>
+          <p style={{ fontSize: '.85rem', color: '#6b7280', marginBottom: '.85rem', lineHeight: 1.55, flex: 1 }}>{f.desc}</p>
           <Link to="/contact"
-            style={{ fontSize: '.85rem', fontWeight: 700, color: f.color, fontFamily: "'Sora',sans-serif", display:'inline-flex', alignItems:'center', gap:'.35rem' }}
+            style={{ fontSize: '.85rem', fontWeight: 700, color: f.color, fontFamily: "'Sora',sans-serif", display:'inline-flex', alignItems:'center', gap:'.35rem', marginTop: 'auto' }}
           >
             Contact Us <ArrowIcon size={13} />
           </Link>
@@ -327,9 +332,7 @@ export default function FlavorsPage() {
   const { isMobile } = useDevice()
 
   const filtered =
-    active === 'All'        ? ALL_FLAVORS :
-    active === 'With Video' ? ALL_FLAVORS.filter(f => f.video) :
-                              ALL_FLAVORS.filter(f => f.tag === active)
+    active === 'All' ? ALL_FLAVORS : ALL_FLAVORS.filter(f => f.tag === active)
 
   return (
     <>
@@ -338,17 +341,14 @@ export default function FlavorsPage() {
         <div className="blob" style={{ width: 400, height: 400, top: '-20%', right: '-5%', background: 'rgba(155,93,229,.18)' }} />
         <div className="blob" style={{ width: 280, height: 280, bottom: '-10%', left: '5%', background: 'rgba(230,57,70,.15)', animationDelay: '-3s' }} />
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <span className="label" style={{ justifyContent: 'center' }}>12 Bold Flavors · 4 Video Stories</span>
+          <span className="label" style={{ justifyContent: 'center' }}>12 Bold Flavors</span>
           <h1>Find Your <span className="grad">Perfect Fizz</span></h1>
-          <p>Hover the video cards to watch each flavor come alive — or tap to open in cinematic fullscreen.</p>
+          <p>Explore our premium range of bold, globally-inspired flavors — each crafted around the iconic Codd-neck bottle.</p>
         </div>
         <svg viewBox="0 0 1440 60" style={{ position: 'absolute', bottom: -1, left: 0, width: '100%', fill: '#fffdf5', pointerEvents: 'none' }}>
           <path d="M0,30 C480,60 960,0 1440,30 L1440,60 L0,60 Z" />
         </svg>
       </section>
-
-      {/* Premium banner — crossfades through all flavor splash images */}
-      <FlavorsBanner isMobile={isMobile} />
 
       {/* Filter + grid */}
       <section style={{ background: '#fffdf5', padding: '4rem 0 6rem' }}>
@@ -371,7 +371,7 @@ export default function FlavorsPage() {
                   transform: active === tag ? 'translateY(-1px)' : 'none',
                 }}
               >
-                {tag === 'With Video' ? '▶ With Video' : tag}
+                {tag}
               </button>
             ))}
           </div>
@@ -388,9 +388,7 @@ export default function FlavorsPage() {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: .55, delay: (i % 4) * .07 }}
               >
-                {f.video
-                  ? <VideoFlavorCard  f={f} isMobile={isMobile} index={i} onWatch={() => setLightbox(f)} />
-                  : <StaticFlavorCard f={f} isMobile={isMobile} index={i} />}
+                <StaticFlavorCard f={f} isMobile={isMobile} index={i} />
               </motion.div>
             ))}
           </div>

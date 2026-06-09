@@ -574,19 +574,12 @@ export default function HistoryPage() {
             fontWeight: 700, lineHeight: 1.35, marginBottom: '1.4rem',
             letterSpacing: '-0.02em',
           }}>
-            <SplitText text="Crafted with bold desi flavors," delay={0} />
+            <SplitText text="Crafted With Bold Global Flavors," delay={0} />
             <br />
-            <SplitText text="IndiColas brings a fizzy twist" delay={0.5} />
+            <SplitText text="Indicolas brings a Fizzy twist" delay={0.5} />
             <br />
             <SplitText text="to every moment." delay={1} />
           </p>
-          <motion.p
-            initial={{ opacity: 0 }} whileInView={{ opacity: .85 }}
-            viewport={{ once: true }} transition={{ duration: 0.6, delay: 1.4 }}
-            style={{ marginBottom: '2.5rem' }}
-          >
-            Inspired by generations of joy. Crafted for today.
-          </motion.p>
           <Link to="/flavors" className="btn btn-white" style={{ fontSize: '1rem', padding: '1rem 2.5rem' }}>
             Explore Our Flavors →
           </Link>
