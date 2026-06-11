@@ -18,6 +18,8 @@ const HistoryPage      = lazy(() => import('./pages/HistoryPage'))
 const FlavorsPage      = lazy(() => import('./pages/FlavorsPage'))
 const FlavorDetailPage = lazy(() => import('./pages/FlavorDetailPage'))
 const OutletsPage      = lazy(() => import('./pages/OutletsPage'))
+const ReviewsPage      = lazy(() => import('./pages/ReviewsPage'))
+const AdminPage        = lazy(() => import('./pages/AdminPage'))
 const ContactPage      = lazy(() => import('./pages/ContactPage'))
 
 gsap.registerPlugin(ScrollTrigger)
@@ -89,7 +91,9 @@ export default function App() {
           <Route path="/flavors"        element={<Suspense fallback={<RouteFallback />}><FlavorsPage      /></Suspense>} />
           <Route path="/flavor/:slug"   element={<Suspense fallback={<RouteFallback />}><FlavorDetailPage /></Suspense>} />
           <Route path="/outlets"        element={<Suspense fallback={<RouteFallback />}><OutletsPage      /></Suspense>} />
-          <Route path="/contact" element={<Suspense fallback={<RouteFallback />}><ContactPage /></Suspense>} />
+          <Route path="/reviews"        element={<Suspense fallback={<RouteFallback />}><ReviewsPage      /></Suspense>} />
+          <Route path="/admin"          element={<Suspense fallback={<RouteFallback />}><AdminPage        /></Suspense>} />
+          <Route path="/contact"        element={<Suspense fallback={<RouteFallback />}><ContactPage      /></Suspense>} />
         </Routes>
       </main>
       <Footer />

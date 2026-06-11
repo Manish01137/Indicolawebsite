@@ -127,7 +127,8 @@ export default function Footer() {
                 { label: 'About',       to: '/about' },
                 { label: 'History',     to: '/history' },
                 { label: 'Our Flavors', to: '/flavors' },
-                { label: 'Outlets',     to: '/outlets' },
+                { label: 'Location',    to: '/outlets' },
+                { label: 'Reviews',     to: '/reviews' },
                 { label: 'Contact',     to: '/contact' },
               ].map(l => (
                 <li key={l.to}>
