@@ -540,6 +540,85 @@ function PairingsSection({ f }) {
   )
 }
 
+/* ─────────── NUTRITION ─────────── */
+function NutritionSection({ f }) {
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  if (!f.nutrient) return null
+  return (
+    <section ref={ref} style={{
+      padding: 'clamp(4rem,7vw,6rem) 0',
+      background: '#fffdf5',
+      position: 'relative', overflow: 'hidden',
+    }}>
+      {/* Soft accent blobs */}
+      <div style={{
+        position: 'absolute', width: 380, height: 380, borderRadius: '50%',
+        background: `radial-gradient(circle, ${f.color}1a, transparent 70%)`,
+        top: '-10%', right: '-8%', filter: 'blur(40px)', pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute', width: 300, height: 300, borderRadius: '50%',
+        background: `radial-gradient(circle, ${f.color}14, transparent 70%)`,
+        bottom: '-10%', left: '-6%', filter: 'blur(40px)', pointerEvents: 'none',
+      }} />
+
+      <div className="container" style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 720 }}>
+        <motion.div
+          initial={{ opacity: 0 }} animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.5 }}
+          className="label" style={{ justifyContent: 'center', color: f.color, marginBottom: '1rem' }}
+        >
+          Nutrition Facts
+        </motion.div>
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          style={{
+            fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
+            marginBottom: '.8rem',
+            letterSpacing: '-0.03em', color: '#1a1a2e',
+          }}
+        >
+          What's <span style={{ color: f.color }}>Inside</span>
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          style={{ color: '#6b7280', fontSize: '1rem', lineHeight: 1.7, marginBottom: '2.5rem' }}
+        >
+          Full ingredient panel and nutrition information — exactly what you're sipping.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30, scale: 0.96 }} animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
+          transition={{ duration: 0.7, delay: 0.15 }}
+          style={{
+            background: '#fff',
+            borderRadius: 24,
+            padding: 'clamp(1rem, 2.5vw, 1.8rem)',
+            border: `1px solid ${f.color}1f`,
+            boxShadow: `0 24px 60px ${f.color}1a, 0 4px 14px rgba(26,26,46,.06)`,
+            display: 'inline-block', maxWidth: '100%',
+          }}
+        >
+          <img
+            src={f.nutrient}
+            alt={`${f.name} nutrition facts`}
+            loading="lazy"
+            style={{
+              display: 'block',
+              maxWidth: '100%', width: 'auto', height: 'auto',
+              maxHeight: 720,
+              borderRadius: 14,
+            }}
+          />
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
 /* ─────────── RELATED ─────────── */
 function RelatedFlavors({ f }) {
   const related = getRelated(f.related).slice(0, 4)
@@ -701,6 +780,7 @@ export default function FlavorDetailPage() {
       <TastingNotes    f={flavor} />
       <FeaturesSection f={flavor} />
       <PairingsSection f={flavor} />
+      <NutritionSection f={flavor} />
       <RelatedFlavors  f={flavor} />
       <BottomCTA       f={flavor} />
 

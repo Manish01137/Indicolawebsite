@@ -12,6 +12,7 @@ export const FLAVORS = [
     light: '#ffd5d8',
     glow: 'rgba(230,57,70,.45)',
     img: '/images/flaoverpage/cherrryCola.png',
+    nutrient: '/images/Nutrientphoto/cherry-cola.png',
     bottleImg: '/images/cherry-cola.png',
     video: '/videos/cherrycola.mp4',
     story: [
@@ -44,6 +45,7 @@ export const FLAVORS = [
     light: '#ffe3ef',
     glow: 'rgba(255,112,166,.45)',
     img: '/images/flaoverpage/cocoberry.png',
+    nutrient: '/images/Nutrientphoto/coco-berry.png',
     bottleImg: '/images/coco-berry.png',
     video: '/videos/cocaberry.mp4',
     story: [
@@ -76,6 +78,7 @@ export const FLAVORS = [
     light: '#eaf6e4',
     glow: 'rgba(6,214,160,.45)',
     img: '/images/flaoverpage/gingerlime.png',
+    nutrient: '/images/Nutrientphoto/ginger-lime.png',
     bottleImg: '/images/ginger-lime.png',
     video: '/videos/gingerlime.mp4',
     story: [
@@ -108,6 +111,7 @@ export const FLAVORS = [
     light: '#ede3fc',
     glow: 'rgba(155,93,229,.45)',
     img: '/images/flaoverpage/cottonCanday.png',
+    nutrient: '/images/Nutrientphoto/cotton-candy.png',
     bottleImg: '/images/cotton-candy.png',
     video: '/videos/cottoncanday.mp4',
     story: [
@@ -140,6 +144,7 @@ export const FLAVORS = [
     light: '#eee0ff',
     glow: 'rgba(124,58,237,.45)',
     img: '/images/flaoverpage/berrymagma.png',
+    nutrient: '/images/Nutrientphoto/berry-magma.png',
     bottleImg: '/images/berry-magma.png',
     story: [
       'A roaring rush of blackberry, blueberry, and raspberry — bold, deep, and fully unleashed. Berry Magma earns its name.',
@@ -171,6 +176,7 @@ export const FLAVORS = [
     light: '#feeac8',
     glow: 'rgba(247,127,0,.45)',
     img: '/images/flaoverpage/pinachicola.png',
+    nutrient: '/images/Nutrientphoto/pinachi.png',
     bottleImg: '/images/pinachi.png',
     story: [
       'Sun-ripened pineapple, hand-picked tropical brightness, and a soft cola whisper. A vacation in every sip.',
@@ -202,6 +208,7 @@ export const FLAVORS = [
     light: '#fff5d6',
     glow: 'rgba(255,209,102,.45)',
     img: '/images/flaoverpage/AmericanIcecream.png',
+    nutrient: '/images/Nutrientphoto/americano-ice-cream.png',
     bottleImg: '/images/americano-icecream.png',
     story: [
       'Velvety vanilla ice cream meets crisp soda water — the float you grew up loving, in a bottle you can take anywhere.',
@@ -233,6 +240,7 @@ export const FLAVORS = [
     light: '#fdf2d8',
     glow: 'rgba(233,196,106,.45)',
     img: '/images/flaoverpage/fruitbeer.png',
+    nutrient: '/images/Nutrientphoto/fruitbeer.png',
     bottleImg: '/images/peach-punch.png',
     story: [
       'A grown-up profile of toasted malt, lifted by fresh fruit brightness. All the depth, none of the alcohol.',
@@ -295,6 +303,7 @@ export const FLAVORS = [
     light: '#fde8d8',
     glow: 'rgba(244,162,97,.45)',
     img: '/images/flaoverpage/citrusBlast.png',
+    nutrient: '/images/Nutrientphoto/citrus-blast.png',
     bottleImg: '/images/citrus-blast.png',
     story: [
       'Sun-soaked oranges, sharp lemons, and a hint of grapefruit — Citrus Blast hits like an afternoon in the sun.',
@@ -326,6 +335,7 @@ export const FLAVORS = [
     light: '#ffd6df',
     glow: 'rgba(255,77,109,.45)',
     img: '/images/flaoverpage/strawberry.png',
+    nutrient: '/images/Nutrientphoto/strawberry-margarita.png',
     bottleImg: '/images/strawberry.png',
     story: [
       'Juicy strawberries with a kiss of salt-rim warmth — the margarita vibe, zero-proof, full party.',
@@ -357,6 +367,7 @@ export const FLAVORS = [
     light: '#ffeacf',
     glow: 'rgba(255,179,71,.45)',
     img: '/images/flaoverpage/peachpunch.png',
+    nutrient: '/images/Nutrientphoto/peach-punch.png',
     bottleImg: '/images/peach-punch.png',
     story: [
       'Soft peach, ripe at the height of summer, balanced by a bright punch-style fizz. Properly mood-lifting.',
