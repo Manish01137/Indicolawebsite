@@ -213,6 +213,7 @@ function FlavorHero({ f }) {
             <img src={f.img} alt={f.name}
               style={{
                 width: '100%', height: 'auto', display: 'block',
+                borderRadius: 24,
                 filter: `drop-shadow(0 28px 56px ${f.color}55) drop-shadow(0 8px 22px rgba(26,26,46,.18))`,
               }}
             />
@@ -609,8 +610,8 @@ function NutritionSection({ f }) {
             style={{
               display: 'block',
               maxWidth: '100%', width: 'auto', height: 'auto',
-              maxHeight: 720,
-              borderRadius: 14,
+              maxHeight: 360,
+              borderRadius: 12,
             }}
           />
         </motion.div>
@@ -654,17 +655,36 @@ function RelatedFlavors({ f }) {
                     transition: 'box-shadow .35s',
                   }}
                 >
-                  <div style={{
-                    height: 220, position: 'relative', overflow: 'hidden',
-                    background: `linear-gradient(160deg, ${r.bg}, #fff)`,
-                  }}>
-                    <img src={r.img} alt={r.name}
-                      style={{
-                        position: 'absolute', inset: 0,
-                        width: '100%', height: '100%', objectFit: 'cover',
-                      }} loading="lazy"
-                    />
-                  </div>
+                  {(() => {
+                    const isPhoto = /\.(jpe?g|webp)$/i.test(r.img)
+                    return (
+                      <div style={{
+                        height: 240, position: 'relative', overflow: 'hidden',
+                        background: `linear-gradient(160deg, ${r.bg}, #fff)`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: isPhoto ? 0 : '1rem',
+                      }}>
+                        {!isPhoto && (
+                          <div style={{
+                            position: 'absolute', width: 160, height: 160, borderRadius: '50%',
+                            background: `radial-gradient(circle, ${r.color}33, transparent 70%)`,
+                            filter: 'blur(28px)', pointerEvents: 'none',
+                          }} />
+                        )}
+                        <img src={r.img} alt={r.name}
+                          style={isPhoto ? {
+                            width: '100%', height: '100%', objectFit: 'cover',
+                          } : {
+                            position: 'relative', zIndex: 1,
+                            maxWidth: '100%', maxHeight: '100%',
+                            width: 'auto', height: 'auto',
+                            objectFit: 'contain',
+                            filter: `drop-shadow(0 14px 22px ${r.color}40)`,
+                          }} loading="lazy"
+                        />
+                      </div>
+                    )
+                  })()}
                   <div style={{ padding: '1.1rem 1.3rem 1.3rem' }}>
                     <span className="tag" style={{ background: r.color, color: '#fff', marginBottom: '.5rem', display: 'inline-block' }}>
                       {r.tag}

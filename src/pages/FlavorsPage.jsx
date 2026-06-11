@@ -189,17 +189,28 @@ function VideoFlavorCard({ f, onWatch, isMobile, index }) {
             }}
           />
 
-          {/* Static image fallback */}
-          <img src={f.img} alt={f.name} loading="lazy"
-            style={{
-              position: 'absolute', inset: 0, margin: 'auto',
-              maxHeight: '85%', maxWidth: '70%', objectFit: 'contain',
-              filter: `drop-shadow(0 16px 28px ${f.color}40)`,
-              opacity: hovered || isMobile ? 0 : 1,
-              transition: 'opacity .5s ease',
-              zIndex: 0,
-            }}
-          />
+          {/* Static image fallback — JPG photos fill card, transparent PNG bottles float on gradient */}
+          {(() => {
+            const isPhoto = /\.(jpe?g|webp)$/i.test(f.img)
+            return (
+              <img src={f.img} alt={f.name} loading="lazy"
+                style={isPhoto ? {
+                  position: 'absolute', inset: 0,
+                  width: '100%', height: '100%', objectFit: 'cover',
+                  opacity: hovered || isMobile ? 0 : 1,
+                  transition: 'opacity .5s ease',
+                  zIndex: 0,
+                } : {
+                  position: 'absolute', inset: 0, margin: 'auto',
+                  maxHeight: '85%', maxWidth: '70%', objectFit: 'contain',
+                  filter: `drop-shadow(0 16px 28px ${f.color}40)`,
+                  opacity: hovered || isMobile ? 0 : 1,
+                  transition: 'opacity .5s ease',
+                  zIndex: 0,
+                }}
+              />
+            )
+          })()}
 
           {/* Video play badge */}
           <button
