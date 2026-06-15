@@ -14,6 +14,22 @@
     <!-- Preload above-the-fold critical assets — fast first paint -->
     <link rel="preload" as="image" href="/images/logo.png" fetchpriority="high" />
     <link rel="preload" as="image" href="/images/homepagephoto/cola1.png" fetchpriority="high" />
+
+    <!-- Magellan AI Pixel (iHeartMedia attribution) -->
+    <script>
+      (function(w, d, n){
+          if (w.MAI) return;
+          w.MAI = w.MAI || {emit: function() {(w.MAI.q = w.MAI.q || []).push(arguments);}};
+          var e = d.createElement(n);
+          e.async = 1;
+          e.src = 'https://cdn.mgln.ai/pixel.min.js';
+          var s = d.getElementsByTagName(n)[0];
+          s.parentNode.insertBefore(e, s);
+      })(window, document, 'script');
+
+      MAI.emit('conf', '019eb755e0117a6bb4a4828608a19be9');
+      /* MAI.emit('view') fires from App.jsx on every route change (SPA-aware) */
+    </script>
   </head>
   <body>
     <div id="root"></div>

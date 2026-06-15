@@ -246,6 +246,13 @@ function ReviewForm({ onSubmitted }) {
       return
     }
     setStatus('ok')
+    /* Magellan AI — track review as a lead conversion */
+    if (typeof window !== 'undefined' && window.MAI) {
+      window.MAI.emit('lead', 0, 'USD', {
+        productId: flavor || 'general',
+        quantity: 1,
+      })
+    }
     setName(''); setLoc(''); setRating(5); setTitle(''); setBody(''); setFlavor(''); setHp('')
     onSubmitted?.()
     setTimeout(() => setStatus(null), 4500)
